@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Buddy · 友好问候</title>
+    <!-- 语义化HTML5最佳实践：简洁、无障碍、轻量 -->
+    <style>
+        /* 极简重置 + 柔和的视觉风格 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #f7f3e9 0%, #fff4e5 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 1rem;
+            /* 错误处理：若背景失效，纯色回退 */
+            background-color: #f7f3e9;
+        }
+
+        /* 主卡片：语义化内容容器 */
+        .greeting-card {
+            max-width: 720px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px); /* 兼容Safari回退 */
+            background-color: #ffffff; /* 不支持backdrop-filter时的纯色回退 */
+            border-radius: 3rem 1rem 3rem 1rem;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15),
+                        0 8px 24px -6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: box-shadow 0.2s ease;
+        }
+
+        /* 轻微悬停反馈 (非必要但提升体验) */
+        .greeting-card:hover {
+            box-shadow: 0 28px 48px -16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 主问候语：语义化h1 */
+        .greeting-title {
+            font-size: clamp(2.8rem, 12vw, 5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #1e1e2a;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: center;
+            gap: 0.2rem 0.6rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 高亮「buddy」一词，体现友好 */
+        .greeting-title .highlight {
+            background: linear-gradient(135deg, #f97316, #e11d48);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-color: #f97316; /* 不支持渐变时的回退色 */
+            color: #f97316;           /* 更广泛回退 (部分浏览器) */
+            font-weight: 650;
+            padding: 0 0.1em;
+        }
+
+        /* 副标题/描述 —— 语义化p */
+        .greeting-description {
+            font-size: 1.35rem;
+            line-height: 1.6;
+            color: #2c2c3a;
+            margin: 1.2rem 0 1.8rem 0;
+            padding: 0 0.5rem;
+            border-left: 4px solid #f97316;
+            border-right: 4px solid transparent;
+            display: inline-block;
+            background: rgba(249, 115, 22, 0.04);
+            border-radius: 0 12px 12px 0;
+        }
+
+        /* 友好的行动号召 (纯装饰，无JS) */
+        .buddy-note {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem 1.5rem;
+            margin-top: 2.5rem;
+            font-size: 1.1rem;
+            color: #3b3b4a;
+        }
+
+        .buddy-note span {
+            background: #f2ede4;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        /* 辅助/错误处理：如果字体或渐变加载失败，保持可读 */
+        .fallback-note {
+            font-size: 0.85rem;
+            color: #6b6b7a;
+            margin-top: 2rem;
+            opacity: 0.7;
+            border-top: 1px dashed #d7d0c5;
+            padding-top: 1.2rem;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 480px) {
+            .greeting-card {
+                padding: 2rem 1.2rem;
+                border-radius: 2rem 0.8rem 2rem 0.8rem;
+            }
+            .greeting-description {
+                font-size: 1.1rem;
+                border-left-width: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 语义化主结构：article 表示独立内容区块 -->
+    <article class="greeting-card" role="main" aria-labelledby="greeting-heading">
+        <!-- 使用h1群组，确保标题层级清晰 -->
+        <h1 class="greeting-title" id="greeting-heading">
+            <span>Hello</span>
+            <!-- “buddy” 使用span+class实现视觉高亮，语义上保持连贯 -->
+            <span class="highlight" aria-label="buddy">Buddy</span>
+            <!-- 修改点：将原来“👋”换成“可爱女生”，保留语义和装饰 -->
+            <span aria-hidden="true">可爱女生</span>
+        </h1>
+
+        <!-- 描述段落：强调友好、简洁 -->
+        <p class="greeting-description">
+            Hey friend, you made it. <br aria-hidden="true">
+            <span style="font-size: 0.95em; opacity: 0.8;">· ready when you are ·</span>
+        </p>
+
+        <!-- 额外的友好信息，增加趣味，同时保持语义 -->
+        <div class="buddy-note">
+            <span>☕  coffee?</span>
+            <span>✨  let's code</span>
+            <span>🌱  simple & semantic</span>
+        </div>
+
+        <!-- 一个极简的“错误处理”友好提示：显示备用信息，保证任何情况下都有正向反馈 -->
+        <p class="fallback-note">
+            ⚡ 语义化HTML5 · 最佳实践 · 优雅回退
+        </p>
+
+        <!-- 隐藏的辅助文本，仅供屏幕阅读器 (体现无障碍/错误处理意识) -->
+        <p class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;">
+            Hello Buddy! 欢迎使用语义化HTML5页面。所有样式均有回退机制，确保在任何浏览器下均可读。可爱的女生在此问候。
+        </p>
+    </article>
+</body>
+</html>

@@ -1,0 +1,271 @@
+这是您需要的HTML5页面代码。它构建了一个简洁的问候卡片，并遵循了语义化、响应式和无障碍的最佳实践。
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>问候 · 简洁卡片</title>
+    <!-- 遵循语义化 & 最佳实践: 轻量、无额外依赖、含错误处理 -->
+    <style>
+        /* 极简重置 + 系统级字体，保证可访问性与性能 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #f5f7fa 0%, #e9edf2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            line-height: 1.5;
+            color: #1f2937;
+        }
+
+        /* 主卡片 – 语义化 main 包裹，增强可读性 */
+        main {
+            max-width: 480px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.02);
+            transition: box-shadow 0.2s ease;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* 针对低带宽/慢连接用户，保留基本可读性 */
+        main:focus-visible {
+            outline: 3px solid #3b82f6;
+            outline-offset: 4px;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: baseline;
+            gap: 0.2rem 0.5rem;
+        }
+
+        .greeting-emoji {
+            font-size: 2.8rem;
+            line-height: 1;
+            display: inline-block;
+            transform: scale(1);
+            transition: transform 0.15s ease;
+        }
+
+        /* 增加微交互动效（不影响无障碍） */
+        .greeting-emoji:hover {
+            transform: scale(1.08);
+        }
+
+        .greeting-text {
+            font-weight: 500;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* 副标题/描述 */
+        .description {
+            font-size: 1.1rem;
+            color: #374151;
+            margin: 1rem 0 1.8rem 0;
+            padding: 0 0.2rem;
+            border-bottom: 1px dashed #d1d5db;
+            padding-bottom: 1.2rem;
+        }
+
+        /* 交互区 – 显示用户输入/状态 */
+        .greeting-area {
+            background: #f9fafb;
+            border-radius: 1.5rem;
+            padding: 1.5rem 1rem;
+            margin: 0.8rem 0 1.5rem 0;
+            border: 1px solid #e5e7eb;
+            min-height: 5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .greeting-message {
+            font-size: 1.5rem;
+            font-weight: 500;
+            word-break: break-word;
+            color: #111827;
+        }
+
+        /* 占位/空状态 – 优雅降级 */
+        .placeholder-message {
+            color: #6b7280;
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        /* 输入与按钮 – 简洁且符合无障碍 */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.2rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: #374151;
+            text-align: left;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input {
+            flex: 1 1 180px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 100px;
+            font-size: 1rem;
+            background: white;
+            transition: border 0.15s, box-shadow 0.1s;
+            font-family: inherit;
+            color: #1f2937;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            outline: none;
+        }
+
+        /* 优雅处理无效输入（占位，无需额外样式） */
+        input:user-invalid {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+
+        button {
+            background: #1f2937;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 0.75rem 1.6rem;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            white-space: nowrap;
+            flex: 0 0 auto;
+        }
+
+        button:hover {
+            background: #111827;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        button:focus-visible {
+            outline: 3px solid #3b82f6;
+            outline-offset: 2px;
+        }
+
+        /* 错误信息区域 – 动态显示友好错误 */
+        .error-message {
+            margin-top: 0.75rem;
+            min-height: 1.8rem;
+            font-size: 0.9rem;
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 0.3rem 1rem;
+            border-radius: 100px;
+            display: inline-block;
+            width: auto;
+            max-width: 100%;
+            transition: opacity 0.15s;
+            border: 1px solid #fecaca;
+        }
+
+        .error-message:empty {
+            opacity: 0;
+            border-color: transparent;
+        }
+
+        /* 页脚 – 语义化 + 辅助信息 */
+        footer {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        footer a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 420px) {
+            main {
+                padding: 1.8rem 1.2rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .greeting-message {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 语义化主内容：角色为问候卡片 -->
+    <main aria-labelledby="greeting-heading">
+        <h1 id="greeting-heading">
+            <span class="greeting-emoji" aria-hidden="true">👋</span>
+            <span class="greeting-text">hello</span>
+        </h1>
+
+        <!-- 描述区域：体现语义 -->
+        <p class="description">输入你的名字，收获专属问候</p>
+
+        <!-- 动态问候展示区 – 用 aria-live 温柔提示动态内容 -->
+        <section class="greeting-area" aria-live="polite" aria-atomic="true">
+            <!-- 默认显示占位问候，如果js未加载

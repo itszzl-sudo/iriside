@@ -80,7 +80,8 @@
         <!-- 元素操作面板 -->
         <div v-if="selectedElement" class="element-panel">
           <div class="element-info">
-            <span>已选择: {{ selectedElement.tagName }}</span>
+            <span class="element-type-badge">{{ getElementTypeName(selectedElement.elementType) }}</span>
+            <span>{{ selectedElement.tagName }}</span>
             <span v-if="selectedElement.id" class="element-id">#{{ selectedElement.id }}</span>
             <span v-if="selectedElement.text" class="element-text">"{{ selectedElement.text }}"</span>
             <button @click="selectedElement = null; suggestions = []" class="clear-btn">✕</button>
@@ -192,10 +193,60 @@ export default {
 
     const handleSend = async (userInput, elementContext) => {
       let fullPrompt = userInput;
+      let needsConfirmation = false;
+      let confirmationMessage = '';
       
       if (elementContext && currentCode.value) {
         const el = elementContext;
-        fullPrompt = `修改当前HTML页面中的 ${el.tagName}${el.id ? '#' + el.id : ''} 元素${el.text ? '（内容："' + el.text + '"）' : ''}：${userInput}\n\n当前代码：\n${currentCode.value}`;
+        const elType = el.elementType || 'text';
+        
+        const typeKeywords = {
+          image: ['图片', '图像', '图', '照片', 'img', 'image', '图形', '图标'],
+          graphic: ['图形', '图标', 'svg', '矢量', '插画', '形状'],
+          video: ['视频', '动画', 'video'],
+          text: ['文字', '文本', '标题', '段落', '字']
+        };
+        
+        let detectedTargetType = null;
+        let isTypeMatch = true;
+        
+        for (const [type, keywords] of Object.entries(typeKeywords)) {
+          if (keywords.some(kw => userInput.includes(kw))) {
+            detectedTargetType = type;
+            break;
+          }
+        }
+        
+        if (detectedTargetType && detectedTargetType !== elType) {
+          if (elType === 'text' && detectedTargetType !== 'text') {
+            needsConfirmation = true;
+            confirmationMessage = `当前选择的是"${el.text}"（文本），但您要替换为${detectedTargetType === 'image' ? '图片' : detectedTargetType === 'graphic' ? '图形' : detectedTargetType}。\n\n是否确认将文本替换为${detectedTargetType === 'image' ? '图片' : detectedTargetType === 'graphic' ? '图形' : detectedTargetType}？`;
+          } else if (elType === 'image' && detectedTargetType === 'text') {
+            needsConfirmation = true;
+            confirmationMessage = `当前选择的是图片，但您要替换为文本。\n\n是否确认将图片替换为文本？`;
+          } else if (elType === 'graphic' && detectedTargetType !== 'graphic') {
+            needsConfirmation = true;
+            confirmationMessage = `当前选择的是图形元素，但您要替换为${detectedTargetType === 'image' ? '图片' : '文本'}。\n\n是否确认类型转换？`;
+          }
+        }
+        
+        if (needsConfirmation) {
+          const confirmed = window.confirm(confirmationMessage);
+          if (!confirmed) {
+            messages.value.push({
+              type: 'system',
+              content: '❌ 操作已取消',
+              timestamp: Date.now()
+            });
+            return;
+          }
+        }
+        
+        const typeHint = elType === 'graphic' ? '（这是一个图形/SVG元素，替换时也应该是图形）' :
+                        elType === 'image' ? '（这是一个图片元素）' :
+                        elType === 'video' ? '（这是一个视频元素）' : '';
+        
+        fullPrompt = `修改当前HTML页面中的 ${el.tagName}${el.id ? '#' + el.id : ''} 元素${typeHint}${el.text ? '（内容："' + el.text + '"）' : ''}：${userInput}\n\n当前代码：\n${currentCode.value}`;
       }
       
       messages.value.push({
@@ -328,12 +379,25 @@ export default {
           document.addEventListener('click', function(e) {
             e.stopPropagation();
             const el = e.target;
+            const elType = el.tagName === 'IMG' ? 'image' :
+                          el.tagName === 'SVG' || el.closest('svg') ? 'graphic' :
+                          el.tagName === 'VIDEO' ? 'video' :
+                          el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ? 'input' :
+                          el.innerText && el.innerText.length > 0 ? 'text' : 'container';
+            
             window.parent.postMessage({
               type: 'element-selected',
               tagName: el.tagName,
               id: el.id,
               className: el.className,
-              text: el.innerText?.substring(0, 50)
+              text: el.innerText?.substring(0, 50),
+              elementType: elType,
+              src: el.src || el.href,
+              style: {
+                background: getComputedStyle(el).background,
+                color: getComputedStyle(el).color,
+                fontSize: getComputedStyle(el).fontSize
+              }
             }, '*');
           }, true);
         <\/script>
@@ -427,6 +491,19 @@ export default {
       suggestions.value = [];
     };
 
+    // 获取元素类型名称
+    const getElementTypeName = (type) => {
+      const names = {
+        image: '🖼️ 图片',
+        graphic: '🎨 图形',
+        video: '🎬 视频',
+        input: '✏️ 输入',
+        text: '📝 文本',
+        container: '📦 容器'
+      };
+      return names[type] || '📄 元素';
+    };
+
     return {
       currentMode,
       messages,
@@ -454,7 +531,8 @@ export default {
       optimizeCode,
       formatTime,
       addElementStyle,
-      applySuggestion
+      applySuggestion,
+      getElementTypeName
     };
   }
 };
@@ -757,6 +835,15 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.element-type-badge {
+  padding: 2px 8px;
+  background: #007acc;
+  color: white;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .element-text {
