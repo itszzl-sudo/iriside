@@ -66,18 +66,30 @@ AST-IDE是一个**探索性前瞻性研究项目**，旨在为下一代AI IDE踩
 ## 功能特性
 
 ### 已实现（第一季）
-- [x] 对话框交互界面
-- [x] AI代码生成（JavaScript + HTML + CSS）
-- [x] AST常驻索引
-- [x] 增量更新
-- [x] Spec/Vibe双模式
-- [x] Git自动提交
-- [x] 完整Web页面渲染验证
-- [x] 自研WebGPU渲染引擎（启动<50ms）
-- [x] CSSOM完整支持
-- [x] IDE内置Web规范
-- [x] CSS层叠、布局、响应式、动画验证
-- [x] 无浏览器依赖
+- [x] AST解析引擎（tree-sitter + JS/HTML/CSS解析器）
+- [x] 符号提取（函数、类、变量、DOM元素、CSS选择器）
+- [x] AST缓存和符号表管理
+- [x] 增量索引系统（chokidar文件监听）
+- [x] 符号存储（SQLite + LevelDB）
+- [x] 源码管控服务
+- [x] 静态验证（语法、ID唯一性、DOM引用）
+- [x] 后台验证服务（TypeError、安全检测、逻辑完整性）
+- [x] 内置Web规范库（HTML5/CSS3/ES6+）
+- [x] AI模型对接（DeepSeek/OpenAI/Mock）
+- [x] 上下文管理（会话压缩）
+- [x] 代码生成器
+- [x] 代码切片器（精准提取）
+- [x] 代码合并器（AST合并）
+- [x] 对话框交互界面（Vue3）
+- [x] Spec/Vibe模式切换
+- [x] AST树只读查看
+- [x] Git集成（自动提交）
+- [ ] Electron桌面应用
+- [ ] 完整Web页面渲染验证
+- [ ] 自研WebGPU渲染引擎（启动<50ms）
+- [ ] CSSOM完整支持
+- [ ] CSS层叠、布局、响应式、动画验证
+- [ ] 无浏览器依赖
 
 ### 规划中（第二季）
 - [ ] TypeScript支持
