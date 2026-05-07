@@ -172,8 +172,10 @@ pnpm dev
 
 ## 文档
 
-- [第一季技术规格](./ide.txt) - JavaScript + HTML基础验证
+- [第一季技术规格](./ide.txt) - JavaScript + HTML + CSS完整验证
 - [第二季技术规格](./idev2.txt) - 多语言和高级功能扩展
+- [对比分析（中文）](./COMPARISON_CN.md) - AST-IDE第一季 vs 现有AI IDE详细对比
+- [Comparison (English)](./COMPARISON_EN.md) - AST-IDE Season 1 vs Existing AI IDEs
 
 ## 协议
 
