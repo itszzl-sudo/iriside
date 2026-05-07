@@ -133,6 +133,82 @@
         </div>
       </div>
     </div>
+    
+    <!-- 底部快速开始栏 -->
+    <div class="quick-start-bar">
+      <div class="quick-start-content">
+        <button @click="showHelloWorldPanel = !showHelloWorldPanel" class="hello-world-btn">
+          🚀 从Hello World开始
+        </button>
+        <div v-if="showHelloWorldPanel" class="hello-world-panel">
+          <div class="panel-section">
+            <h4>📊 渐进式学习路径</h4>
+            <div class="progress-path">
+              <div v-for="(level, index) in helloWorldLevels" :key="index" 
+                   class="level-card"
+                   :class="{ completed: helloWorldProgress > index, current: helloWorldProgress === index }"
+                   @click="startHelloLevel(index)">
+                <div class="level-badge">{{ index + 1 }}</div>
+                <div class="level-info">
+                  <div class="level-name">{{ level.name }}</div>
+                  <div class="level-desc">{{ level.desc }}</div>
+                </div>
+                <div class="level-status">{{ helloWorldProgress > index ? '✓' : helloWorldProgress === index ? '▶' : '○' }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="panel-section">
+            <h4>🎮 挑战模式</h4>
+            <div class="challenge-buttons">
+              <button @click="startChallenge('random')" class="challenge-btn">🎲 随机挑战</button>
+              <button @click="startChallenge('timer')" class="challenge-btn">⏱️ 限时挑战</button>
+              <button @click="startChallenge('ai')" class="challenge-btn">🤖 AI对战</button>
+              <button @click="startChallenge('reverse')" class="challenge-btn">🔄 逆向工程</button>
+            </div>
+          </div>
+          
+          <div class="panel-section">
+            <h4>✨ 快速变体</h4>
+            <div class="variant-grid">
+              <button @click="createHelloVariant('minimal')" class="variant-btn">📝 最简版</button>
+              <button @click="createHelloVariant('styled')" class="variant-btn">🎨 美化版</button>
+              <button @click="createHelloVariant('animated')" class="variant-btn">🎬 动画版</button>
+              <button @click="createHelloVariant('interactive')" class="variant-btn">🖱️ 交互版</button>
+              <button @click="createHelloVariant('responsive')" class="variant-btn">📱 响应式</button>
+              <button @click="createHelloVariant('dark')" class="variant-btn">🌙 暗黑风</button>
+              <button @click="createHelloVariant('neon')" class="variant-btn">💜 霓虹风</button>
+              <button @click="createHelloVariant('3d')" class="variant-btn">🎲 3D效果</button>
+              <button @click="createHelloVariant('particle')" class="variant-btn">✴️ 粒子版</button>
+              <button @click="createHelloVariant('game')" class="variant-btn">🎯 游戏化</button>
+              <button @click="createHelloVariant('music')" class="variant-btn">🎵 音效版</button>
+              <button @click="createHelloVariant('canvas')" class="variant-btn">🖼️ Canvas版</button>
+            </div>
+          </div>
+          
+          <div class="panel-section">
+            <h4>🧪 实验室</h4>
+            <div class="lab-buttons">
+              <button @click="openLab('mix')" class="lab-btn">🔀 混合风格</button>
+              <button @click="openLab('evolve')" class="lab-btn">🧬 自动进化</button>
+              <button @click="openLab('remix')" class="lab-btn">🎧 AI Remix</button>
+              <button @click="openLab('mutation')" class="lab-btn">🦠 变异生成</button>
+            </div>
+          </div>
+          
+          <div class="panel-section" v-if="helloWorldSuggestions.length > 0">
+            <h4>💡 智能建议</h4>
+            <div class="smart-suggestions">
+              <div v-for="(suggestion, index) in helloWorldSuggestions" :key="index"
+                   class="suggestion-card" @click="applyHelloSuggestion(suggestion)">
+                <span class="suggestion-icon">{{ suggestion.icon }}</span>
+                <span class="suggestion-text">{{ suggestion.text }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -162,6 +238,19 @@ export default {
     const selectedElement = ref(null);
     const suggestions = ref([]);
     const previewFrame = ref(null);
+    const showHelloWorldPanel = ref(false);
+    const helloWorldProgress = ref(0);
+    const helloWorldSuggestions = ref([]);
+    
+    const helloWorldLevels = ref([
+      { name: 'Hello World', desc: '最基础的开始' },
+      { name: 'Hello + 样式', desc: '添加颜色和字体' },
+      { name: 'Hello + 布局', desc: '居中、边距、容器' },
+      { name: 'Hello + 交互', desc: '点击、悬停效果' },
+      { name: 'Hello + 动画', desc: '过渡、关键帧' },
+      { name: 'Hello + 响应式', desc: '适配不同屏幕' },
+      { name: '完整应用', desc: '整合所有技能' }
+    ]);
     
     const templates = ref([
       { icon: '📊', name: '数据表格', desc: '美观的数据展示表格', prompt: '创建一个美观的数据表格，包含姓名、年龄、职业、薪资，带头像和操作按钮' },
@@ -510,6 +599,93 @@ export default {
       return names[type] || '📄 元素';
     };
 
+    // Hello World 功能实现
+    const startHelloLevel = (level) => {
+      const levelPrompts = [
+        '创建一个最简单的Hello World页面，只有一个h1标签显示"Hello World"',
+        '在Hello World基础上添加CSS样式：字体用sans-serif，颜色用蓝色，字号48px',
+        '创建一个居中的Hello World页面：内容在屏幕正中央，使用flexbox布局，背景色浅灰',
+        '创建一个可交互的Hello World：鼠标悬停文字放大1.2倍，点击弹出alert',
+        '创建一个动画Hello World：文字淡入效果，持续2秒，循环呼吸动画',
+        '创建一个响应式Hello World：手机端字号24px，平板36px，桌面48px，使用媒体查询',
+        '创建一个完整的小应用：Hello World标题、输入框、按钮，点击按钮显示自定义问候语'
+      ];
+      
+      helloWorldProgress.value = level;
+      showHelloWorldPanel.value = false;
+      handleSend(levelPrompts[level]);
+      
+      setTimeout(() => {
+        generateHelloSuggestions(level);
+      }, 1000);
+    };
+
+    const startChallenge = (type) => {
+      showHelloWorldPanel.value = false;
+      
+      const challenges = {
+        random: ['创建一个Hello World，随机使用一种配色方案', '创建一个Hello World，随机添加一种装饰效果', '创建一个Hello World，随机选择一种字体风格'][Math.floor(Math.random() * 3)],
+        timer: '创建一个Hello World页面，文字会每秒变色一次，持续10秒，使用JavaScript setInterval',
+        ai: '创建两个不同风格的Hello World，一个极简风格，一个华丽风格，让用户选择更喜欢哪个',
+        reverse: '我给你看一个Hello World的CSS效果描述，你来生成对应的代码：文字有金色渐变、阴影、3D旋转效果'
+      };
+      
+      handleSend(challenges[type]);
+    };
+
+    const createHelloVariant = (variant) => {
+      showHelloWorldPanel.value = false;
+      
+      const variants = {
+        minimal: '创建最简Hello World：纯文本，无样式，10行以内代码',
+        styled: '创建精美Hello World：渐变背景、优雅字体、居中布局、阴影效果',
+        animated: '创建动画Hello World：文字弹跳进入、颜色渐变循环、粒子背景',
+        interactive: '创建交互Hello World：可拖拽文字、点击变色、双击放大、右键菜单',
+        responsive: '创建响应式Hello World：适配手机/平板/桌面/超大屏幕，每个尺寸有不同布局',
+        dark: '创建暗黑风Hello World：深色背景、霓虹文字、发光效果、科技感',
+        neon: '创建霓虹风Hello World：紫色/青色霓虹灯效果、闪烁动画、赛博朋克风格',
+        '3d': '创建3D Hello World：文字3D旋转、透视效果、立体感、悬浮动画',
+        particle: '创建粒子Hello World：文字由粒子组成、鼠标靠近粒子散开、远离聚合',
+        game: '创建游戏化Hello World：文字是游戏角色、可控制移动、收集星星、计分系统',
+        music: '创建音效Hello World：点击文字播放音符、悬停有音效、键盘可演奏',
+        canvas: '创建Canvas Hello World：使用Canvas绘制文字、波浪效果、动态背景'
+      };
+      
+      handleSend(variants[variant]);
+    };
+
+    const openLab = (type) => {
+      showHelloWorldPanel.value = false;
+      
+      const labs = {
+        mix: '创建一个Hello World，随机混合以下风格中的3种：霓虹、复古、极简、赛博朋克、日式、欧式、工业风',
+        evolve: '创建一个可以自动进化的Hello World：每5秒自动改变一种样式属性（颜色、字号、位置），展示20种变化',
+        remix: '创建一个AI Remix版Hello World：融合音乐可视化、粒子效果、响应式设计三种技术',
+        mutation: '创建一个变异Hello World：从基础版本开始，逐步变异出10种不同的子版本，每个都保持Hello World核心'
+      };
+      
+      handleSend(labs[type]);
+    };
+
+    const generateHelloSuggestions = (level) => {
+      const suggestionsByLevel = [
+        [{ icon: '🎨', text: '添加颜色和字体' }, { icon: '📐', text: '居中布局' }],
+        [{ icon: '✨', text: '添加渐变背景' }, { icon: '💫', text: '添加阴影' }],
+        [{ icon: '🖱️', text: '添加悬停效果' }, { icon: '📱', text: '做成响应式' }],
+        [{ icon: '🎬', text: '添加动画' }, { icon: '🔊', text: '添加音效' }],
+        [{ icon: '🎮', text: '做成小游戏' }, { icon: '🧪', text: '实验新效果' }],
+        [{ icon: '🌐', text: '添加多语言' }, { icon: '♿', text: '优化无障碍' }],
+        [{ icon: '🚀', text: '部署上线' }, { icon: '📦', text: '打包优化' }]
+      ];
+      
+      helloWorldSuggestions.value = suggestionsByLevel[level] || [];
+    };
+
+    const applyHelloSuggestion = (suggestion) => {
+      showHelloWorldPanel.value = false;
+      handleSend(`在当前Hello World基础上，${suggestion.text}`);
+    };
+
     return {
       currentMode,
       messages,
@@ -526,6 +702,10 @@ export default {
       suggestions,
       previewFrame,
       previewContentWithScript,
+      showHelloWorldPanel,
+      helloWorldProgress,
+      helloWorldLevels,
+      helloWorldSuggestions,
       handleModeChange,
       handleSend,
       loadHistory,
@@ -538,7 +718,12 @@ export default {
       formatTime,
       addElementStyle,
       applySuggestion,
-      getElementTypeName
+      getElementTypeName,
+      startHelloLevel,
+      startChallenge,
+      createHelloVariant,
+      openLab,
+      applyHelloSuggestion
     };
   }
 };
@@ -572,6 +757,200 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
+}
+
+.quick-start-bar {
+  height: 60px;
+  background: #1e1e1e;
+  border-top: 1px solid #3c3c3c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-start-content {
+  position: relative;
+}
+
+.hello-world-btn {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.hello-world-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.hello-world-panel {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  max-height: 500px;
+  overflow-y: auto;
+  background: #252526;
+  border: 1px solid #3c3c3c;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.panel-section {
+  margin-bottom: 24px;
+}
+
+.panel-section:last-child {
+  margin-bottom: 0;
+}
+
+.panel-section h4 {
+  margin-bottom: 12px;
+  color: #d4d4d4;
+  font-size: 14px;
+}
+
+.progress-path {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.level-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #2d2d30;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.level-card:hover {
+  background: #37373d;
+}
+
+.level-card.completed {
+  opacity: 0.6;
+}
+
+.level-card.current {
+  background: #007acc;
+  box-shadow: 0 0 10px rgba(0, 122, 204, 0.5);
+}
+
+.level-badge {
+  width: 32px;
+  height: 32px;
+  background: #3c3c3c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.level-card.current .level-badge {
+  background: white;
+  color: #007acc;
+}
+
+.level-info {
+  flex: 1;
+}
+
+.level-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.level-desc {
+  font-size: 12px;
+  color: #858585;
+}
+
+.level-status {
+  font-size: 20px;
+}
+
+.challenge-buttons, .lab-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.challenge-btn, .lab-btn {
+  padding: 10px 20px;
+  background: #2d2d30;
+  border: 1px solid #3c3c3c;
+  color: #d4d4d4;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.challenge-btn:hover, .lab-btn:hover {
+  background: #007acc;
+  border-color: #007acc;
+}
+
+.variant-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.variant-btn {
+  padding: 8px 12px;
+  background: #2d2d30;
+  border: 1px solid #3c3c3c;
+  color: #d4d4d4;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.variant-btn:hover {
+  background: #007acc;
+  border-color: #007acc;
+}
+
+.smart-suggestions {
+  display: flex;
+  gap: 12px;
+}
+
+.suggestion-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #2d2d30;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.suggestion-card:hover {
+  background: #37373d;
+}
+
+.suggestion-icon {
+  font-size: 20px;
 }
 
 .header h1 {
