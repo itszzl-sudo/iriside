@@ -64,13 +64,30 @@ export default {
         loading: true
       });
 
-      setTimeout(() => {
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: userInput,
+            mode: currentMode.value
+          })
+        });
+
+        const result = await response.json();
+        
         messages.value[messages.value.length - 1] = {
           type: 'assistant',
-          content: `已收到需求：${userInput}\n\n代码生成中...`,
+          content: result.code || result.message,
           timestamp: Date.now()
         };
-      }, 1000);
+      } catch (error) {
+        messages.value[messages.value.length - 1] = {
+          type: 'assistant',
+          content: `错误: ${error.message}\n\n请确保已配置API密钥并启动后端服务`,
+          timestamp: Date.now()
+        };
+      }
     };
 
     const handleViewAST = (astData) => {

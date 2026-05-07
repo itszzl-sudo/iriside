@@ -4,7 +4,8 @@
   "description": "基于常驻AST增量索引的AI集成开发环境 - 探索性前瞻性研究项目",
   "main": "electron/main.js",
   "scripts": {
-    "dev": "vite",
+    "dev": "node server.js",
+    "dev:ui": "vite",
     "build": "vite build",
     "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:3000 && electron .\"",
     "electron:build": "vite build && electron-builder",
@@ -24,6 +25,7 @@
     "chokidar": "^4.0.1",
     "dotenv": "^17.4.2",
     "electron": "^42.0.0",
+    "express": "^5.2.1",
     "isomorphic-git": "^1.37.6",
     "level": "^10.0.0",
     "tree-sitter": "^0.21.0",
