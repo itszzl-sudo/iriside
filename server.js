@@ -2,10 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const { createServer } = require('vite');
 const path = require('path');
+const fs = require('fs');
 const { AIConnector, DeepSeekProvider, OpenAIProvider } = require('./src/ai-engine/AIConnector');
 const CodeGenerator = require('./src/ai-engine/CodeGenerator');
 const ContextManager = require('./src/ai-engine/ContextManager');
 const ASTParser = require('./src/ast-engine/ASTParser');
+const StaticValidator = require('./src/ast-engine/StaticValidator');
 
 async function startServer() {
   const app = express();
@@ -18,6 +20,13 @@ async function startServer() {
   const contextManager = new ContextManager();
   const codeGenerator = new CodeGenerator(aiConnector, contextManager);
   const astParser = new ASTParser();
+  const staticValidator = new StaticValidator();
+  
+  // 创建输出目录
+  const outputDir = path.join(process.cwd(), 'output');
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
 
   // API路由 - 必须在Vite中间件之前
   app.use('/api', express.json());
@@ -42,15 +51,39 @@ async function startServer() {
         provider: process.env.AI_PROVIDER || 'deepseek'
       });
       
-      console.log(`[${new Date().toLocaleTimeString()}] 生成成功，解析AST...`);
+      console.log(`[${new Date().toLocaleTimeString()}] 生成成功`);
       
-      // 解析生成的代码为AST
+      // 自动保存文件
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const filename = `generated-${timestamp}.html`;
+      const filepath = path.join(outputDir, filename);
+      
+      fs.writeFileSync(filepath, result.code, 'utf-8');
+      console.log(`[${new Date().toLocaleTimeString()}] 已保存: ${filename}`);
+      
+      // 自动验证
+      let validation = null;
+      try {
+        const validationResult = staticValidator.validate(result.code, 'html', filename);
+        validation = {
+          valid: validationResult.valid,
+          errors: validationResult.errors.length,
+          warnings: validationResult.warnings.length
+        };
+        
+        if (!validationResult.valid) {
+          console.log(`[${new Date().toLocaleTimeString()}] 验证发现 ${validation.errors} 个问题`);
+        }
+      } catch (valError) {
+        console.error('验证失败:', valError.message);
+      }
+      
+      // 解析AST
       let astData = null;
       try {
         const code = result.code;
-        const ast = astParser.parse(code, 'html', 'generated.html');
+        const ast = astParser.parse(code, 'html', filename);
         
-        // 为每个符号添加源码片段
         const lines = code.split('\n');
         const symbolsWithCode = ast.symbols.map(symbol => {
           const startRow = symbol.startPosition.row;
@@ -69,7 +102,6 @@ async function startServer() {
           totalSymbols: symbolsWithCode.length,
           sourceCode: code
         };
-        console.log(`[${new Date().toLocaleTimeString()}] AST解析成功，${symbolsWithCode.length}个符号`);
       } catch (parseError) {
         console.error('AST解析失败:', parseError.message);
       }
@@ -79,7 +111,9 @@ async function startServer() {
         code: result.code,
         language: result.language,
         message: '代码生成成功',
-        astData
+        file: filename,
+        astData,
+        validation
       });
       
     } catch (error) {
@@ -103,7 +137,6 @@ async function startServer() {
         });
       }
       
-      // 检测语言
       let language = 'html';
       if (code.includes('function') || code.includes('const ') || code.includes('let ')) {
         language = 'javascript';
@@ -129,13 +162,33 @@ async function startServer() {
     }
   });
 
+  // 打开预览路由
+  app.post('/api/open-preview', async (req, res) => {
+    try {
+      const { file } = req.body;
+      const filepath = path.join(outputDir, file);
+      
+      if (fs.existsSync(filepath)) {
+        const { exec } = require('child_process');
+        exec(`start "" "${filepath}"`);
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ success: false, message: '文件不存在' });
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  // 静态文件服务 - 提供output目录访问
+  app.use('/output', express.static(outputDir));
+
   // 启动Vite开发服务器
   const vite = await createServer({
     server: { middlewareMode: true },
     appType: 'spa'
   });
 
-  // Vite中间件放在API路由之后
   app.use(vite.middlewares);
 
   const PORT = 3000;
@@ -143,6 +196,7 @@ async function startServer() {
     console.log(`\n✅ AST-IDE服务器已启动`);
     console.log(`📍 地址: http://localhost:${PORT}`);
     console.log(`🤖 AI Provider: ${process.env.AI_PROVIDER || 'deepseek'}`);
+    console.log(`📁 输出目录: ${outputDir}`);
     console.log(`\n请在浏览器打开上述地址开始使用\n`);
   });
 }

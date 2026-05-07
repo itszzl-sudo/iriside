@@ -13,6 +13,15 @@
         @viewAST="handleViewAST"
       />
       
+      <div v-if="showPreview" class="preview-panel">
+        <div class="preview-header">
+          <h3>实时预览</h3>
+          <button @click="openInBrowser" title="在新窗口打开">🌐</button>
+          <button @click="showPreview = false">×</button>
+        </div>
+        <iframe :srcdoc="previewContent" class="preview-frame"></iframe>
+      </div>
+      
       <ASTViewer 
         v-if="showASTViewer"
         :astData="currentAST"
@@ -40,6 +49,10 @@ export default {
     const messages = ref([]);
     const showASTViewer = ref(false);
     const currentAST = ref(null);
+    const showPreview = ref(false);
+    const previewContent = ref('');
+    const currentFile = ref(null);
+    const generationHistory = ref([]);
 
     const handleModeChange = (mode) => {
       currentMode.value = mode;
@@ -76,12 +89,54 @@ export default {
 
         const result = await response.json();
         
+        // 自动保存到历史
+        generationHistory.value.unshift({
+          timestamp: Date.now(),
+          prompt: userInput,
+          code: result.code,
+          file: result.file
+        });
+        
+        // 构建显示内容
+        let displayContent = result.code || result.message;
+        
+        // 如果有验证结果，添加提示
+        if (result.validation) {
+          const validationInfo = [];
+          
+          if (result.validation.errors > 0) {
+            validationInfo.push(`⚠️ 发现 ${result.validation.errors} 个错误`);
+          }
+          
+          if (result.validation.warnings > 0) {
+            validationInfo.push(`💡 ${result.validation.warnings} 个优化建议`);
+          }
+          
+          if (validationInfo.length > 0) {
+            displayContent += '\n\n---\n**自动验证结果:**\n' + validationInfo.join('\n');
+          }
+        }
+        
+        // 添加文件保存信息
+        if (result.file) {
+          displayContent += `\n\n📁 已自动保存: ${result.file}`;
+          currentFile.value = result.file;
+        }
+        
         messages.value[messages.value.length - 1] = {
           type: 'assistant',
-          content: result.code || result.message,
+          content: displayContent,
           timestamp: Date.now(),
-          astData: result.astData || null
+          astData: result.astData || null,
+          hasPreview: result.language === 'html'
         };
+        
+        // 自动预览HTML
+        if (result.language === 'html' && result.code) {
+          previewContent.value = result.code;
+          showPreview.value = true;
+        }
+        
       } catch (error) {
         messages.value[messages.value.length - 1] = {
           type: 'assistant',
@@ -96,7 +151,6 @@ export default {
         currentAST.value = message.astData;
         showASTViewer.value = true;
       } else {
-        // 如果消息没有AST数据，请求后端解析
         parseAndShowAST(message.content);
       }
     };
@@ -117,14 +171,31 @@ export default {
       }
     };
 
+    const openInBrowser = async () => {
+      if (currentFile.value) {
+        try {
+          await fetch('/api/open-preview', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ file: currentFile.value })
+          });
+        } catch (error) {
+          console.error('打开预览失败:', error);
+        }
+      }
+    };
+
     return {
       currentMode,
       messages,
       showASTViewer,
       currentAST,
+      showPreview,
+      previewContent,
       handleModeChange,
       handleSend,
-      handleViewAST
+      handleViewAST,
+      openInBrowser
     };
   }
 };
@@ -170,5 +241,58 @@ body {
   display: flex;
   overflow: hidden;
   position: relative;
+}
+
+.preview-panel {
+  position: absolute;
+  right: 520px;
+  top: 0;
+  width: 500px;
+  height: 100%;
+  background: #252526;
+  border-left: 1px solid #3c3c3c;
+  display: flex;
+  flex-direction: column;
+  z-index: 90;
+}
+
+.preview-header {
+  height: 50px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #3c3c3c;
+}
+
+.preview-header h3 {
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.preview-header button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: #858585;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-header button:hover {
+  background: #3c3c3c;
+  color: #d4d4d4;
+}
+
+.preview-frame {
+  flex: 1;
+  border: none;
+  background: white;
 }
 </style>
