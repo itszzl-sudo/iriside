@@ -49,12 +49,27 @@ async function startServer() {
       try {
         const code = result.code;
         const ast = astParser.parse(code, 'html', 'generated.html');
+        
+        // 为每个符号添加源码片段
+        const lines = code.split('\n');
+        const symbolsWithCode = ast.symbols.map(symbol => {
+          const startRow = symbol.startPosition.row;
+          const endRow = symbol.endPosition.row;
+          const codeSnippet = lines.slice(startRow, endRow + 1).join('\n');
+          
+          return {
+            ...symbol,
+            code: codeSnippet
+          };
+        });
+        
         astData = {
-          symbols: ast.symbols,
+          symbols: symbolsWithCode,
           language: 'html',
-          totalSymbols: ast.symbols.length
+          totalSymbols: symbolsWithCode.length,
+          sourceCode: code
         };
-        console.log(`[${new Date().toLocaleTimeString()}] AST解析成功，${ast.symbols.length}个符号`);
+        console.log(`[${new Date().toLocaleTimeString()}] AST解析成功，${symbolsWithCode.length}个符号`);
       } catch (parseError) {
         console.error('AST解析失败:', parseError.message);
       }

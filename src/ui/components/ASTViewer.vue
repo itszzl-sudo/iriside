@@ -5,12 +5,17 @@
       <button @click="$emit('close')">×</button>
     </div>
     <div class="ast-content">
-      <div v-if="astData" class="ast-tree">
+      <div v-if="astData && astData.symbols" class="ast-tree">
+        <div class="ast-stats">
+          <span>语言: {{ astData.language }}</span>
+          <span>符号数: {{ astData.totalSymbols }}</span>
+        </div>
         <ASTNode 
           v-for="(node, index) in nodes" 
           :key="index"
           :node="node"
           :depth="0"
+          :sourceCode="sourceCode"
         />
       </div>
       <div v-else class="empty">
@@ -42,13 +47,22 @@ export default {
       return props.astData.symbols.map(symbol => ({
         type: symbol.type || symbol.symbol_type,
         name: symbol.name || symbol.symbol_name,
+        tagName: symbol.tagName || symbol.tag_name,
         position: symbol.startPosition || { row: symbol.start_row, column: symbol.start_column },
+        endPosition: symbol.endPosition || { row: symbol.end_row, column: symbol.end_column },
+        attributes: symbol.attributes || {},
+        code: symbol.code || null,
         children: []
       }));
     });
 
+    const sourceCode = computed(() => {
+      return props.astData?.sourceCode || '';
+    });
+
     return {
-      nodes
+      nodes,
+      sourceCode
     };
   }
 };
@@ -59,7 +73,7 @@ export default {
   position: absolute;
   right: 0;
   top: 0;
-  width: 400px;
+  width: 500px;
   height: 100%;
   background: #252526;
   border-left: 1px solid #3c3c3c;
@@ -102,6 +116,17 @@ export default {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
+}
+
+.ast-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: #2d2d30;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #858585;
 }
 
 .ast-tree {
