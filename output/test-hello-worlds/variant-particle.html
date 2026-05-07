@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello World - Particle</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+}
+canvas {
+  display: block;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles = [];
+const text = 'Hello World';
+ctx.font = '80px Arial';
+ctx.fillStyle = 'white';
+ctx.fillText(text, canvas.width/2 - ctx.measureText(text).width/2, canvas.height/2);
+
+const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+for (let y = 0; y < imageData.height; y += 4) {
+  for (let x = 0; x < imageData.width; x += 4) {
+    if (imageData.data[(y * imageData.width + x) * 4 + 3] > 128) {
+      particles.push({ x, y, baseX: x, baseY: y, size: 2 });
+    }
+  }
+}
+
+function animate() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  particles.forEach(p => {
+    const dist = Math.hypot(p.baseX - mouse.x, p.baseY - mouse.y);
+    const force = Math.min(100 / dist, 10);
+    const angle = Math.atan2(p.baseY - mouse.y, p.baseX - mouse.x);
+    
+    p.x = p.baseX + Math.cos(angle) * force * 5;
+    p.y = p.baseY + Math.sin(angle) * force * 5;
+    
+    ctx.fillStyle = `hsl(${p.x * 0.5}, 100%, 60%)`;
+    ctx.fillRect(p.x, p.y, p.size, p.size);
+  });
+  
+  requestAnimationFrame(animate);
+}
+
+const mouse = { x: 0, y: 0 };
+canvas.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+animate();
+</script>
+</body>
+</html>

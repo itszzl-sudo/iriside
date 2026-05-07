@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello World - Music</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: sans-serif;
+}
+h1 {
+  font-size: 5rem;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s;
+}
+h1:active {
+  transform: scale(0.95);
+}
+#keys {
+  position: fixed;
+  bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+.key {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,0.3);
+  border: 2px solid white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.key:hover {
+  background: rgba(255,255,255,0.5);
+}
+.key.active {
+  background: rgba(255,255,255,0.8);
+  transform: scale(1.1);
+}
+</style>
+</head>
+<body>
+<h1 id="hello" onclick="playNote(440)">Hello World</h1>
+<div id="keys">
+  <div class="key" data-note="1">1</div>
+  <div class="key" data-note="2">2</div>
+  <div class="key" data-note="3">3</div>
+  <div class="key" data-note="4">4</div>
+  <div class="key" data-note="5">5</div>
+  <div class="key" data-note="6">6</div>
+  <div class="key" data-note="7">7</div>
+</div>
+<script>
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88];
+
+function playNote(freq) {
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  
+  oscillator.frequency.value = freq;
+  oscillator.type = 'sine';
+  
+  gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+  
+  oscillator.start(audioCtx.currentTime);
+  oscillator.stop(audioCtx.currentTime + 0.5);
+}
+
+document.querySelectorAll('.key').forEach(key => {
+  key.addEventListener('click', () => {
+    const noteIndex = parseInt(key.dataset.note) - 1;
+    playNote(notes[noteIndex]);
+    key.classList.add('active');
+    setTimeout(() => key.classList.remove('active'), 100);
+  });
+});
+
+document.addEventListener('keydown', e => {
+  const noteNum = parseInt(e.key);
+  if (noteNum >= 1 && noteNum <= 7) {
+    const key = document.querySelector(`.key[data-note="${noteNum}"]`);
+    playNote(notes[noteNum - 1]);
+    key.classList.add('active');
+    setTimeout(() => key.classList.remove('active'), 100);
+  }
+});
+</script>
+</body>
+</html>

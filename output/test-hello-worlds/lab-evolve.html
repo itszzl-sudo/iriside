@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello World - Evolving</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  font-family: sans-serif;
+}
+h1 {
+  font-size: 4rem;
+  color: white;
+  transition: all 0.5s ease;
+}
+#counter {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  color: white;
+  font-size: 1rem;
+}
+</style>
+</head>
+<body>
+<h1 id="hello">Hello World</h1>
+<div id="counter">变化: 1/20</div>
+<script>
+const hello = document.getElementById('hello');
+const counter = document.getElementById('counter');
+const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
+let change = 0;
+
+const interval = setInterval(() => {
+  change++;
+  if (change > 20) {
+    clearInterval(interval);
+    counter.textContent = '进化完成!';
+    return;
+  }
+  
+  const color = colors[change % colors.length];
+  const size = 2 + Math.sin(change * 0.3) * 2;
+  const rotation = Math.sin(change * 0.5) * 10;
+  
+  hello.style.color = color;
+  hello.style.fontSize = size + 'rem';
+  hello.style.transform = `rotate(${rotation}deg)`;
+  counter.textContent = '变化: ' + change + '/20';
+}, 500);
+</script>
+</body>
+</html>

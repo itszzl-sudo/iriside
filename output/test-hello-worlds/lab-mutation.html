@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello World - Mutation</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #1a1a2e;
+  font-family: sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+.mutation {
+  background: #2d2d30;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.mutation:hover {
+  transform: scale(1.05);
+  background: #3d3d40;
+}
+.mutation h2 {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  transition: all 0.5s;
+}
+.mutation .desc {
+  font-size: 0.8rem;
+  color: #858585;
+}
+</style>
+</head>
+<body>
+<div class="grid" id="grid"></div>
+<script>
+const mutations = [
+  { color: '#667eea', name: 'Basic' },
+  { color: '#764ba2', name: 'Purple' },
+  { color: '#f093fb', name: 'Pink' },
+  { color: '#f5576c', name: 'Coral' },
+  { color: '#4facfe', name: 'Blue' },
+  { color: '#00f2fe', name: 'Cyan' },
+  { color: '#43e97b', name: 'Green' },
+  { color: '#38f9d7', name: 'Teal' },
+  { color: '#fa709a', name: 'Rose' },
+  { color: '#fee140', name: 'Yellow' }
+];
+
+const grid = document.getElementById('grid');
+mutations.forEach((m, i) => {
+  const div = document.createElement('div');
+  div.className = 'mutation';
+  div.innerHTML = `<h2 style="color: ${m.color}">Hello World</h2><div class="desc">变异 #${i+1}</div>`;
+  grid.appendChild(div);
+});
+</script>
+</body>
+</html>

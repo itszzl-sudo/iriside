@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello World - Timer Challenge</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a2e;
+  font-family: sans-serif;
+}
+h1 {
+  font-size: 5rem;
+  transition: color 0.3s;
+}
+#timer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: white;
+  font-size: 1.5rem;
+}
+</style>
+</head>
+<body>
+<h1 id="hello">Hello World</h1>
+<div id="timer">10秒</div>
+<script>
+const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'];
+const hello = document.getElementById('hello');
+const timer = document.getElementById('timer');
+let seconds = 10;
+
+const interval = setInterval(() => {
+  seconds--;
+  timer.textContent = seconds + '秒';
+  
+  if (seconds <= 0) {
+    clearInterval(interval);
+    clearInterval(colorInterval);
+    timer.textContent = '完成!';
+  }
+}, 1000);
+
+const colorInterval = setInterval(() => {
+  hello.style.color = colors[Math.floor(Math.random() * colors.length)];
+}, 1000);
+</script>
+</body>
+</html>

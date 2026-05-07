@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello World - Animated</title>
+<style>
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}
+@keyframes colorShift {
+  0% { color: #667eea; }
+  25% { color: #764ba2; }
+  50% { color: #f093fb; }
+  75% { color: #f5576c; }
+  100% { color: #667eea; }
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a2e;
+  font-family: sans-serif;
+}
+h1 {
+  font-size: 5rem;
+  animation: bounce 2s ease-in-out infinite, colorShift 4s ease infinite;
+}
+</style>
+</head>
+<body>
+<h1>Hello World</h1>
+</body>
+</html>

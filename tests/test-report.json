@@ -1,0 +1,122 @@
+{
+  "passed": 29,
+  "failed": 0,
+  "tests": [
+    {
+      "name": "所有12种变体都返回非空字符串",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "所有变体都包含Hello World文本",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "最简版只包含必要的HTML标签",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "美化版包含渐变背景",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "动画版包含动画定义",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "交互版包含事件处理",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "响应式版包含媒体查询",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "暗黑风包含霓虹效果",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "霓虹风包含闪烁动画",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "3D效果包含透视和旋转",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "粒子版使用Canvas",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "游戏版包含移动控制",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "音效版使用Web Audio API",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "Canvas版使用Canvas API",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "所有7关都返回有效HTML",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "第1关是最简版",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "第7关是完整应用",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "所有4种挑战都返回有效HTML",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "限时挑战包含倒计时",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "AI对战包含两个风格",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "逆向工程生成金色渐变",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "所有4种实验室都返回有效HTML",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "自动进化包含20种变化",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "变异生成包含10种变异",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "generate方法正确路由到各个生成器",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "generate方法对无效输入返回默认值",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "所有生成的代码都符合HTML5标准",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "生成的代码不包含XSS漏洞",
+      "status": "✅ PASS"
+    },
+    {
+      "name": "所有生成器在100ms内完成",
+      "status": "✅ PASS"
+    }
+  ]
+}

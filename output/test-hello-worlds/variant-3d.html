@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello World - 3D</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #434343 0%, #000000 100%);
+  font-family: sans-serif;
+  perspective: 1000px;
+}
+h1 {
+  font-size: 5rem;
+  color: white;
+  transform: rotateX(20deg) rotateY(-20deg);
+  text-shadow: 
+    1px 1px 0 #ddd,
+    2px 2px 0 #d9d9d9,
+    3px 3px 0 #d2d2d2,
+    4px 4px 0 #ccc,
+    5px 5px 0 #c7c7c7,
+    6px 6px 0 #c1c1c1,
+    7px 7px 0 #bbb,
+    8px 8px 0 #b5b5b5,
+    9px 9px 0 #aaa,
+    10px 10px 0 #a5a5a5,
+    11px 11px 10px rgba(0,0,0,0.5);
+  animation: rotate3d 5s ease-in-out infinite;
+}
+@keyframes rotate3d {
+  0%, 100% { transform: rotateX(20deg) rotateY(-20deg); }
+  50% { transform: rotateX(-20deg) rotateY(20deg); }
+}
+</style>
+</head>
+<body>
+<h1>Hello World</h1>
+</body>
+</html>

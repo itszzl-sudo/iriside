@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello World - Game</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #1a1a2e;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+#game {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+#player {
+  position: absolute;
+  font-size: 3rem;
+  cursor: pointer;
+  user-select: none;
+}
+.star {
+  position: absolute;
+  font-size: 2rem;
+  animation: twinkle 1s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+#score {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: white;
+  font-size: 1.5rem;
+}
+#instructions {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  opacity: 0.7;
+}
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="player">Hello World</div>
+  <div id="score">Stars: 0</div>
+  <div id="instructions">Use arrow keys or WASD to move. Collect stars!</div>
+</div>
+<script>
+const player = document.getElementById('player');
+const game = document.getElementById('game');
+let score = 0;
+let x = window.innerWidth / 2 - 75;
+let y = window.innerHeight / 2 - 30;
+player.style.left = x + 'px';
+player.style.top = y + 'px';
+
+function spawnStar() {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.textContent = '⭐';
+  star.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+  star.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+  game.appendChild(star);
+  
+  star.checkCollision = setInterval(() => {
+    const starRect = star.getBoundingClientRect();
+    const playerRect = player.getBoundingClientRect();
+    if (starRect.left < playerRect.right && starRect.right > playerRect.left &&
+        starRect.top < playerRect.bottom && starRect.bottom > playerRect.top) {
+      score++;
+      document.getElementById('score').textContent = 'Stars: ' + score;
+      clearInterval(star.checkCollision);
+      star.remove();
+      spawnStar();
+    }
+  }, 100);
+}
+
+for (let i = 0; i < 5; i++) spawnStar();
+
+window.addEventListener('keydown', e => {
+  const speed = 20;
+  if (e.key === 'ArrowUp' || e.key === 'w') y -= speed;
+  if (e.key === 'ArrowDown' || e.key === 's') y += speed;
+  if (e.key === 'ArrowLeft' || e.key === 'a') x -= speed;
+  if (e.key === 'ArrowRight' || e.key === 'd') x += speed;
+  
+  x = Math.max(0, Math.min(window.innerWidth - 150, x));
+  y = Math.max(0, Math.min(window.innerHeight - 60, y));
+  
+  player.style.left = x + 'px';
+  player.style.top = y + 'px';
+});
+</script>
+</body>
+</html>

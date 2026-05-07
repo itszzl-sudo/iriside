@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello World - AI Battle</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #1a1a2e;
+  font-family: sans-serif;
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+.style-card {
+  flex: 1;
+  background: white;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+.style-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.style-card.selected {
+  box-shadow: 0 0 0 5px #667eea;
+}
+h1 { margin: 0; }
+.label {
+  position: absolute;
+  bottom: 20px;
+  color: #666;
+  font-size: 14px;
+}
+.minimal {
+  background: white;
+}
+.minimal h1 {
+  color: #333;
+  font-size: 3rem;
+}
+.gorgeous {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.gorgeous h1 {
+  color: white;
+  font-size: 4rem;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+</style>
+</head>
+<body>
+<div class="style-card minimal" onclick="select(this)">
+  <h1>Hello World</h1>
+  <div class="label">极简风格</div>
+</div>
+<div class="style-card gorgeous" onclick="select(this)">
+  <h1>Hello World</h1>
+  <div class="label">华丽风格</div>
+</div>
+<script>
+function select(card) {
+  document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  setTimeout(() => {
+    alert('你选择了 ' + (card.classList.contains('minimal') ? '极简风格' : '华丽风格') + '!');
+  }, 300);
+}
+</script>
+</body>
+</html>
