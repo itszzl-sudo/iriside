@@ -26,7 +26,7 @@
     <div class="input-area">
       <textarea 
         v-model="inputText"
-        placeholder="输入需求或问题..."
+        :placeholder="placeholder"
         @keydown.enter.exact.prevent="handleSend"
         rows="3"
       />
@@ -39,23 +39,32 @@
 </template>
 
 <script>
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, computed } from 'vue';
 
 export default {
   name: 'ChatBox',
   props: {
     messages: Array,
-    mode: String
+    mode: String,
+    elementContext: Object
   },
   emits: ['send', 'viewAST'],
   setup(props, { emit }) {
     const inputText = ref('');
     const messagesContainer = ref(null);
+    
+    const placeholder = computed(() => {
+      if (props.elementContext) {
+        const el = props.elementContext;
+        return `针对 ${el.tagName}${el.id ? '#' + el.id : ''}${el.text ? ' "' + el.text + '"' : ''} 的修改需求...`;
+      }
+      return '输入需求或问题...';
+    });
 
     const handleSend = () => {
       if (!inputText.value.trim()) return;
       
-      emit('send', inputText.value);
+      emit('send', inputText.value, props.elementContext);
       inputText.value = '';
     };
 
@@ -92,6 +101,7 @@ export default {
     return {
       inputText,
       messagesContainer,
+      placeholder,
       handleSend,
       attachFile,
       getSenderLabel,

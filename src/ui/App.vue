@@ -13,6 +13,7 @@
       <ChatBox 
         :messages="messages"
         :mode="currentMode"
+        :element-context="selectedElement"
         @send="handleSend"
       />
       
@@ -81,6 +82,8 @@
           <div class="element-info">
             <span>已选择: {{ selectedElement.tagName }}</span>
             <span v-if="selectedElement.id" class="element-id">#{{ selectedElement.id }}</span>
+            <span v-if="selectedElement.text" class="element-text">"{{ selectedElement.text }}"</span>
+            <button @click="selectedElement = null; suggestions = []" class="clear-btn">✕</button>
           </div>
           <div class="element-actions">
             <button @click="addElementStyle('边框')" title="添加边框">🖼️ 边框</button>
@@ -90,6 +93,7 @@
             <button @click="addElementStyle('注音')" title="添加注音">🎵 注音</button>
             <button @click="addElementStyle('动画')" title="添加动画">🎬 动画</button>
           </div>
+          <div class="element-hint">💡 在下方对话框输入针对该元素的修改需求</div>
         </div>
         
         <div class="preview-content">
@@ -186,10 +190,19 @@ export default {
       });
     };
 
-    const handleSend = async (userInput) => {
+    const handleSend = async (userInput, elementContext) => {
+      let fullPrompt = userInput;
+      
+      if (elementContext && currentCode.value) {
+        const el = elementContext;
+        fullPrompt = `修改当前HTML页面中的 ${el.tagName}${el.id ? '#' + el.id : ''} 元素${el.text ? '（内容："' + el.text + '"）' : ''}：${userInput}\n\n当前代码：\n${currentCode.value}`;
+      }
+      
       messages.value.push({
         type: 'user',
-        content: userInput,
+        content: elementContext 
+          ? `针对 ${elementContext.tagName}${elementContext.id ? '#' + elementContext.id : ''}：${userInput}`
+          : userInput,
         timestamp: Date.now()
       });
 
@@ -205,7 +218,7 @@ export default {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            prompt: userInput,
+            prompt: fullPrompt,
             mode: currentMode.value
           })
         });
@@ -741,11 +754,33 @@ body {
 .element-info {
   margin-bottom: 8px;
   font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.element-text {
+  color: #ce9178;
+  font-style: italic;
+}
+
+.clear-btn {
+  margin-left: auto;
+  padding: 2px 8px;
+  background: transparent;
+  border: 1px solid #3c3c3c;
+  color: #858585;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.clear-btn:hover {
+  background: #3c3c3c;
+  color: #d4d4d4;
 }
 
 .element-id {
   color: #dcdcaa;
-  margin-left: 8px;
 }
 
 .element-actions {
@@ -769,6 +804,12 @@ body {
 
 .element-actions button:hover {
   background: #0586e8;
+}
+
+.element-hint {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #858585;
 }
 
 .suggestions-panel {
