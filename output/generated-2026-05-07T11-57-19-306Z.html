@@ -1,0 +1,196 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World · 语义化演示</title>
+    <!-- 基础样式重置与视觉优化 (简洁高效) -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #f7f9fc 0%, #eef2f7 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+        /* 主卡片 – 语义清晰，视觉友好 */
+        .greeting-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15), 0 4px 18px rgba(0, 0, 0, 0.05);
+            padding: 3rem 4rem;
+            max-width: 680px;
+            width: 100%;
+            text-align: center;
+            transition: box-shadow 0.25s ease, transform 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .greeting-card:hover {
+            box-shadow: 0 28px 48px -16px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+        /* 标题区域 – 语义标记 <hgroup> 与 <h1> */
+        hgroup {
+            margin-bottom: 1.25rem;
+        }
+        h1 {
+            font-size: 4rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.1;
+            margin-bottom: 0.1rem;
+            display: inline-block;
+        }
+        /* 副标题/语境描述 */
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #475569;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 0.75rem;
+            margin-top: 0.25rem;
+            letter-spacing: 0.3px;
+        }
+        /* 主内容区块 – 语义 <article> 或 <section>，这里用 <main> 包裹 */
+        .content {
+            margin: 1.8rem 0 1.2rem;
+        }
+        .hello-message {
+            font-size: 1.5rem;
+            background: #f1f5f9;
+            padding: 1rem 2rem;
+            border-radius: 60px;
+            display: inline-block;
+            font-weight: 500;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+        }
+        .hello-message strong {
+            font-weight: 600;
+            color: #2563eb;
+        }
+        /* 辅助信息 – 错误处理/备用说明 (语义化友好) */
+        .note {
+            margin-top: 2rem;
+            padding: 0.75rem 1.25rem;
+            background: #f8fafc;
+            border-radius: 48px;
+            font-size: 0.9rem;
+            color: #475569;
+            border: 1px solid #e9edf2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .note code {
+            background: #e2e8f0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            color: #1e293b;
+        }
+        .note .badge {
+            background: #2563eb10;
+            border: 1px solid #2563eb30;
+            color: #1e4b8a;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+        /* 响应式微调 */
+        @media (max-width: 480px) {
+            .greeting-card {
+                padding: 2rem 1.5rem;
+            }
+            h1 {
+                font-size: 3rem;
+            }
+            .hello-message {
+                font-size: 1.2rem;
+                padding: 0.7rem 1.2rem;
+            }
+        }
+        /* 错误处理占位 – 仅用作语义展示 (无实际错误) */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+        [aria-hidden="true"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 主要内容区域 – 使用 <main> 确保唯一主内容 -->
+    <main>
+        <!-- 卡片容器 语义：展示欢迎信息 -->
+        <div class="greeting-card" role="region" aria-label="Hello World 欢迎卡片">
+
+            <!-- 标题组: h1 + h2 完美语义 -->
+            <hgroup>
+                <h1>Hello World</h1>
+                <h2>来自语义化 HTML5 的问候</h2>
+            </hgroup>
+
+            <!-- 核心消息区块 用 article 代表独立内容片段 (虽然简单，但语义贴合) -->
+            <article class="content">
+                <p class="hello-message">
+                    👋 <strong>你好，世界！</strong> 欢迎体验简洁语义的 HTML5。
+                </p>
+                <!-- 隐藏的备用描述，当样式失效时仍然可读 (错误处理思想) -->
+                <span class="sr-only" role="status">页面正常加载，未检测到错误。</span>
+            </article>
+
+            <!-- 底部状态/异常处理演示 – 语义化显示“一切正常” -->
+            <footer class="note" role="status">
+                <span class="badge">✓ 状态</span>
+                <span>页面遵循 HTML5 最佳实践 · 错误处理就绪</span>
+                <!-- 代码风格展示，表示备用/降级方案 -->
+                <code>fallback:语义</code>
+                <!-- 无JavaScript时的优雅降级 (纯CSS/HTML) -->
+                <span aria-hidden="true">✦</span>
+                <span>无脚本依赖</span>
+            </footer>
+
+            <!-- 隐藏的错误占位 (仅用于语义完整性，不会显示) -->
+            <div aria-live="polite" aria-atomic="true" class="sr-only">
+                <!-- 如果发生动态错误，这里可插入通知，但本页无错误 -->
+            </div>
+        </div>
+
+        <!-- 额外的语义说明: 用 <details> 展示技术细节 (可选，体现语义丰富) -->
+        <details style="margin-top: 2.5rem; max-width: 680px; width: 100%; background: rgba(255,255,255,0.5); border-radius: 60px; padding: 0.75rem 1.5rem; border: 1px solid #d1d9e8; backdrop-filter: blur(2px);">
+            <summary style="cursor: pointer; font-weight: 500; color: #1e293b; padding: 0.25rem 0;">📖 语义化构成 · 点击展开</summary>
+            <div style="margin-top: 0.75rem; font-size: 0.9rem; color: #334155; display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; padding: 0.25rem 0 0.5rem;">
+                <span>✅ <code>&lt;main&gt;</code> 主入口</span>
+                <span>✅ <code>&lt;hgroup&gt;</code> + <code>&lt;h1&gt;</code></span>
+                <span>✅ <code>&lt;article&gt;</code> 内容块</span>
+                <span>✅ <code>&lt;footer&gt;</code> 状态栏</span

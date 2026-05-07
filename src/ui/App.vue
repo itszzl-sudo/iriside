@@ -201,33 +201,39 @@ export default {
         const elType = el.elementType || 'text';
         
         const typeKeywords = {
-          image: ['图片', '图像', '图', '照片', 'img', 'image', '图形', '图标'],
-          graphic: ['图形', '图标', 'svg', '矢量', '插画', '形状'],
-          video: ['视频', '动画', 'video'],
+          graphic: ['svg', '矢量', '插画', '形状', '矢量图'],
+          image: ['图片', '图像', '照片', 'img', 'image', 'jpg', 'png', 'gif'],
+          video: ['视频', 'video', 'mp4'],
           text: ['文字', '文本', '标题', '段落', '字']
         };
         
         let detectedTargetType = null;
-        let isTypeMatch = true;
         
         for (const [type, keywords] of Object.entries(typeKeywords)) {
-          if (keywords.some(kw => userInput.includes(kw))) {
+          if (keywords.some(kw => userInput.toLowerCase().includes(kw.toLowerCase()))) {
             detectedTargetType = type;
             break;
           }
         }
         
-        if (detectedTargetType && detectedTargetType !== elType) {
-          if (elType === 'text' && detectedTargetType !== 'text') {
-            needsConfirmation = true;
-            confirmationMessage = `当前选择的是"${el.text}"（文本），但您要替换为${detectedTargetType === 'image' ? '图片' : detectedTargetType === 'graphic' ? '图形' : detectedTargetType}。\n\n是否确认将文本替换为${detectedTargetType === 'image' ? '图片' : detectedTargetType === 'graphic' ? '图形' : detectedTargetType}？`;
-          } else if (elType === 'image' && detectedTargetType === 'text') {
-            needsConfirmation = true;
-            confirmationMessage = `当前选择的是图片，但您要替换为文本。\n\n是否确认将图片替换为文本？`;
-          } else if (elType === 'graphic' && detectedTargetType !== 'graphic') {
-            needsConfirmation = true;
-            confirmationMessage = `当前选择的是图形元素，但您要替换为${detectedTargetType === 'image' ? '图片' : '文本'}。\n\n是否确认类型转换？`;
+        if (userInput.includes('图形') || userInput.includes('图标')) {
+          if (elType === 'graphic') {
+            detectedTargetType = 'graphic';
+          } else {
+            detectedTargetType = 'graphic';
           }
+        }
+        
+        if (detectedTargetType && detectedTargetType !== elType) {
+          const typeNames = {
+            graphic: '图形',
+            image: '图片',
+            video: '视频',
+            text: '文本'
+          };
+          
+          needsConfirmation = true;
+          confirmationMessage = `当前选择的是${typeNames[elType] || '元素'}${el.text ? ' "' + el.text + '"' : ''}，但您要替换为${typeNames[detectedTargetType]}。\n\n是否确认类型转换？`;
         }
         
         if (needsConfirmation) {
@@ -242,7 +248,7 @@ export default {
           }
         }
         
-        const typeHint = elType === 'graphic' ? '（这是一个图形/SVG元素，替换时也应该是图形）' :
+        const typeHint = elType === 'graphic' ? '（这是一个图形/SVG元素，替换时也应该生成图形或SVG代码）' :
                         elType === 'image' ? '（这是一个图片元素）' :
                         elType === 'video' ? '（这是一个视频元素）' : '';
         
