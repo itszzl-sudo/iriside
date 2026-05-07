@@ -75,14 +75,52 @@
             <button @click="showPreview = false">×</button>
           </div>
         </div>
+        
+        <!-- 元素操作面板 -->
+        <div v-if="selectedElement" class="element-panel">
+          <div class="element-info">
+            <span>已选择: {{ selectedElement.tagName }}</span>
+            <span v-if="selectedElement.id" class="element-id">#{{ selectedElement.id }}</span>
+          </div>
+          <div class="element-actions">
+            <button @click="addElementStyle('边框')" title="添加边框">🖼️ 边框</button>
+            <button @click="addElementStyle('阴影')" title="添加阴影">💫 阴影</button>
+            <button @click="addElementStyle('圆角')" title="添加圆角">⭕ 圆角</button>
+            <button @click="addElementStyle('居中')" title="居中">⬇️ 居中</button>
+            <button @click="addElementStyle('注音')" title="添加注音">🎵 注音</button>
+            <button @click="addElementStyle('动画')" title="添加动画">🎬 动画</button>
+          </div>
+        </div>
+        
         <div class="preview-content">
-          <iframe :srcdoc="previewContent" class="preview-frame"></iframe>
+          <iframe 
+            ref="previewFrame"
+            :srcdoc="previewContentWithScript" 
+            class="preview-frame"
+            @load="injectInteractionScript"
+          ></iframe>
           <div v-if="showCode" class="code-overlay">
             <pre><code>{{ currentCode }}</code></pre>
             <button @click="copyCode" class="copy-btn">📋 复制代码</button>
           </div>
         </div>
-        <!-- 自动提示 -->
+        
+        <!-- 智能建议 -->
+        <div v-if="suggestions.length > 0" class="suggestions-panel">
+          <div class="suggestions-header">💡 智能建议</div>
+          <div class="suggestions-list">
+            <div 
+              v-for="(suggestion, index) in suggestions" 
+              :key="index"
+              class="suggestion-item"
+              @click="applySuggestion(suggestion)"
+            >
+              {{ suggestion }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- 验证提示 -->
         <div v-if="validation" class="validation-info">
           <span v-if="validation.errors > 0" class="error">⚠️ {{ validation.errors }} 个问题</span>
           <span v-if="validation.warnings > 0" class="warning">💡 {{ validation.warnings }} 个建议</span>
@@ -94,7 +132,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import ChatBox from './components/ChatBox.vue';
 import ModeSwitch from './components/ModeSwitch.vue';
 
@@ -116,6 +154,9 @@ export default {
     const showTemplates = ref(false);
     const validation = ref(null);
     const history = ref([]);
+    const selectedElement = ref(null);
+    const suggestions = ref([]);
+    const previewFrame = ref(null);
     
     const templates = ref([
       { icon: '📊', name: '数据表格', desc: '美观的数据展示表格', prompt: '创建一个美观的数据表格，包含姓名、年龄、职业、薪资，带头像和操作按钮' },
@@ -265,6 +306,114 @@ export default {
       return `${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
     };
 
+    // 注入交互脚本到预览iframe
+    const previewContentWithScript = computed(() => {
+      if (!previewContent.value) return '';
+      
+      const script = `
+        <script>
+          document.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const el = e.target;
+            window.parent.postMessage({
+              type: 'element-selected',
+              tagName: el.tagName,
+              id: el.id,
+              className: el.className,
+              text: el.innerText?.substring(0, 50)
+            }, '*');
+          }, true);
+        <\/script>
+      `;
+      
+      return previewContent.value.replace('</body>', script + '</body>');
+    });
+
+    // 监听iframe消息
+    onMounted(() => {
+      window.addEventListener('message', (event) => {
+        if (event.data.type === 'element-selected') {
+          selectedElement.value = event.data;
+          generateSuggestions(event.data);
+        }
+      });
+    });
+
+    // 生成智能建议
+    const generateSuggestions = (element) => {
+      const newSuggestions = [];
+      
+      if (element.tagName === 'TABLE') {
+        newSuggestions.push('添加表格斑马纹');
+        newSuggestions.push('添加悬停高亮');
+        newSuggestions.push('添加响应式滚动');
+      }
+      
+      if (element.tagName === 'IMG') {
+        newSuggestions.push('添加圆角边框');
+        newSuggestions.push('添加悬停放大效果');
+        newSuggestions.push('添加加载动画');
+      }
+      
+      if (element.tagName === 'BUTTON') {
+        newSuggestions.push('添加点击波纹效果');
+        newSuggestions.push('添加悬停渐变');
+        newSuggestions.push('添加禁用状态');
+      }
+      
+      if (element.tagName === 'INPUT') {
+        newSuggestions.push('添加聚焦动画');
+        newSuggestions.push('添加验证提示');
+        newSuggestions.push('添加图标');
+      }
+      
+      if (element.tagName === 'DIV' || element.tagName === 'SECTION') {
+        newSuggestions.push('添加卡片阴影');
+        newSuggestions.push('添加渐变背景');
+        newSuggestions.push('添加滚动动画');
+      }
+      
+      suggestions.value = newSuggestions;
+    };
+
+    // 添加元素样式
+    const addElementStyle = async (styleType) => {
+      const el = selectedElement.value;
+      if (!el) return;
+      
+      let prompt = '';
+      
+      switch (styleType) {
+        case '边框':
+          prompt = `为 ${el.tagName}${el.id ? '#' + el.id : ''} 元素添加美观的边框`;
+          break;
+        case '阴影':
+          prompt = `为 ${el.tagName}${el.id ? '#' + el.id : ''} 元素添加柔和的阴影效果`;
+          break;
+        case '圆角':
+          prompt = `为 ${el.tagName}${el.id ? '#' + el.id : ''} 元素添加圆角`;
+          break;
+        case '居中':
+          prompt = `将 ${el.tagName}${el.id ? '#' + el.id : ''} 元素居中显示`;
+          break;
+        case '注音':
+          prompt = `为 ${el.tagName}${el.id ? '#' + el.id : ''} 元素内的文字添加拼音注音`;
+          break;
+        case '动画':
+          prompt = `为 ${el.tagName}${el.id ? '#' + el.id : ''} 元素添加入场动画`;
+          break;
+      }
+      
+      await handleSend(`修改当前HTML页面：${prompt}\n\n当前代码：\n${currentCode.value}`);
+    };
+
+    // 应用建议
+    const applySuggestion = async (suggestion) => {
+      const el = selectedElement.value;
+      await handleSend(`修改当前HTML页面：为 ${el.tagName}${el.id ? '#' + el.id : ''} ${suggestion}\n\n当前代码：\n${currentCode.value}`);
+      suggestions.value = [];
+    };
+
     return {
       currentMode,
       messages,
@@ -277,6 +426,10 @@ export default {
       validation,
       history,
       templates,
+      selectedElement,
+      suggestions,
+      previewFrame,
+      previewContentWithScript,
       handleModeChange,
       handleSend,
       loadHistory,
@@ -286,7 +439,9 @@ export default {
       downloadFile,
       openInBrowser,
       optimizeCode,
-      formatTime
+      formatTime,
+      addElementStyle,
+      applySuggestion
     };
   }
 };
@@ -576,4 +731,75 @@ body {
 .error { color: #f48771; }
 .warning { color: #dcdcaa; }
 .success { color: #89d185; }
+
+.element-panel {
+  padding: 12px 16px;
+  background: #2d2d30;
+  border-bottom: 1px solid #3c3c3c;
+}
+
+.element-info {
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.element-id {
+  color: #dcdcaa;
+  margin-left: 8px;
+}
+
+.element-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.element-actions button {
+  padding: 6px 12px;
+  background: #007acc;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.element-actions button:hover {
+  background: #0586e8;
+}
+
+.suggestions-panel {
+  padding: 8px 16px;
+  background: #2d2d30;
+  border-top: 1px solid #3c3c3c;
+}
+
+.suggestions-header {
+  font-size: 12px;
+  color: #858585;
+  margin-bottom: 8px;
+}
+
+.suggestions-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.suggestion-item {
+  padding: 6px 12px;
+  background: #3c3c3c;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #d4d4d4;
+}
+
+.suggestion-item:hover {
+  background: #007acc;
+  color: white;
+}
 </style>

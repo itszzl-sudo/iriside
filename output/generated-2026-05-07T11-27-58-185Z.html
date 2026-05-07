@@ -1,0 +1,203 @@
+这是为您生成的一款精美产品展示卡片的HTML代码。它包含了产品图片、标题、价格、评分和购买按钮等核心元素，视觉风格现代且信息层级清晰。
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>精美产品展示卡片</title>
+    <!-- 使用系统字体栈，提升加载性能与兼容性 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f5f7fa 0%, #e9edf2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        /* 卡片容器 — 优雅圆角，细腻阴影，柔和背景 */
+        .product-card {
+            max-width: 360px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.12), 0 8px 12px -4px rgba(0, 0, 0, 0.04);
+            overflow: hidden;  /* 保证图片圆角裁剪 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* 给卡片一个微妙的悬浮感 */
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 28px 40px -12px rgba(0, 0, 0, 0.18);
+        }
+
+        /* 图片区域 — 占满宽度，保持比例 */
+        .product-image-wrapper {
+            width: 100%;
+            aspect-ratio: 4 / 3;  /* 现代比例，视觉舒适 */
+            background-color: #f0f2f5;  /* 图片加载占位色 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;      /* 保证图片填充且不变形 */
+            object-position: center;
+            transition: transform 0.4s ease;
+            /* 图片加载失败时的优雅降级 */
+            background: #eef0f3 url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjQ0RENEQ4Ii8+PHBhdGggZD0iTTE2IDI4TDIwIDI0TDI0IDI4TDMwIDIwTDMyIDI0IiBzdHJva2U9IiM5MEE0QUIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSIxOCIgcj0iMiIgZmlsbD0iIzkwQTRBQiIvPjwvc3ZnPg==') no-repeat center center;
+            background-size: 48px 48px;
+        }
+
+        /* 悬停时图片略微放大，增加精致感 */
+        .product-card:hover .product-image {
+            transform: scale(1.02);
+        }
+
+        /* 卡片内容区域 — 干净留白 */
+        .product-content {
+            padding: 1.5rem 1.25rem 1.75rem;
+        }
+
+        /* 标题 — 清晰，中等字重 */
+        .product-title {
+            font-size: 1.35rem;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #1e293b;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
+
+        /* 描述/副标题 (可选) — 保持简洁，可忽略但增加层次 */
+        .product-subtitle {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* 价格与评分行 — 使用flex对齐 */
+        .product-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        /* 价格 — 突出，加粗 */
+        .product-price {
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+
+        .product-price small {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #64748b;
+            margin-left: 0.15rem;
+        }
+
+        /* 评分 — 视觉柔和，星星用原生符号 + 背景强调 */
+        .product-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #f8fafc;
+            padding: 0.2rem 0.65rem 0.2rem 0.5rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: #1e293b;
+            border: 1px solid #e9edf2;
+            line-height: 1.6;
+        }
+
+        .rating-stars {
+            color: #fbbf24;       /* 暖金色星 */
+            letter-spacing: 0.05em;
+            font-size: 1rem;
+        }
+
+        .rating-number {
+            font-weight: 500;
+            margin-left: 0.1rem;
+            color: #334155;
+        }
+
+        .rating-count {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-left: 0.2rem;
+        }
+
+        /* 购买按钮 — 现代，渐变，微交互 */
+        .buy-button {
+            display: block;
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.2s;
+            box-shadow: 0 8px 16px -6px rgba(37, 99, 235, 0.25);
+            letter-spacing: 0.3px;
+            text-align: center;
+            line-height: 1.2;
+            font-family: inherit;
+        }
+
+        .buy-button:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            box-shadow: 0 10px 20px -6px rgba(37, 99, 235, 0.4);
+            transform: scale(1.01);
+        }
+
+        .buy-button:active {
+            transform: scale(0.97);
+            background: #1e40af;
+            box-shadow: 0 4px 8px -2px rgba(37, 99, 235, 0.3);
+        }
+
+        .buy-button:focus-visible {
+            outline: 3px solid #93c5fd;
+            outline-offset: 3px;
+        }
+
+        /* 错误/备用情况：如果图片链接失效，显示占位背景 (已在 .product-image 中定义) */
+        /* 另外，增加一个可访问性隐藏的图片alt描述 */
+
+        /* 响应式微调 */
+        @media (max-width: 480px) {
+            .product-content {
+                padding: 1
