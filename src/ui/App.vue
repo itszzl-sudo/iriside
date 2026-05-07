@@ -4,6 +4,7 @@
       <h1>AST-IDE</h1>
       <div class="header-actions">
         <button @click="showSmartSuggestions = !showSmartSuggestions" class="header-btn">💡 建议</button>
+        <button @click="showFocusTracker = !showFocusTracker" class="header-btn">🎯 焦点</button>
         <button @click="showHistory = !showHistory" class="header-btn">📜 历史</button>
         <button @click="showTemplates = !showTemplates" class="header-btn">📋 模板</button>
         <ModeSwitch :mode="currentMode" @change="handleModeChange" />
@@ -219,6 +220,11 @@
       <SmartSuggestions />
     </div>
     
+    <!-- 焦点追踪面板 -->
+    <div v-if="showFocusTracker" class="focus-tracker-overlay" @click.self="showFocusTracker = false">
+      <FocusTrackerUI />
+    </div>
+    
     <!-- 问题解决器面板 -->
     <div v-if="showProblemSolver" class="problem-solver-overlay" @click.self="showProblemSolver = false">
       <ProblemSolverUI />
@@ -232,6 +238,7 @@ import ChatBox from './components/ChatBox.vue';
 import ModeSwitch from './components/ModeSwitch.vue';
 import ProblemSolverUI from './components/ProblemSolverUI.vue';
 import SmartSuggestions from './components/SmartSuggestions.vue';
+import FocusTrackerUI from './components/FocusTrackerUI.vue';
 import { HelloWorldGenerator } from '../hello-world/HelloWorldGenerator.js';
 
 export default {
@@ -240,7 +247,8 @@ export default {
     ChatBox,
     ModeSwitch,
     ProblemSolverUI,
-    SmartSuggestions
+    SmartSuggestions,
+    FocusTrackerUI
   },
   setup() {
     const currentMode = ref('vibe');
@@ -262,6 +270,7 @@ export default {
     const helloWorldSuggestions = ref([]);
     const showProblemSolver = ref(false);
     const showSmartSuggestions = ref(false);
+    const showFocusTracker = ref(false);
     
     const helloWorldLevels = ref([
       { name: 'Hello World', desc: '最基础的开始' },
@@ -782,6 +791,7 @@ export default {
       helloWorldSuggestions,
       showProblemSolver,
       showSmartSuggestions,
+      showFocusTracker,
       handleModeChange,
       handleSend,
       loadHistory,
@@ -1064,6 +1074,21 @@ body {
 }
 
 .smart-suggestions-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  overflow: auto;
+  padding: 40px 20px;
+}
+
+.focus-tracker-overlay {
   position: fixed;
   top: 0;
   left: 0;
