@@ -79,7 +79,8 @@ export default {
         messages.value[messages.value.length - 1] = {
           type: 'assistant',
           content: result.code || result.message,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          astData: result.astData || null
         };
       } catch (error) {
         messages.value[messages.value.length - 1] = {
@@ -90,9 +91,30 @@ export default {
       }
     };
 
-    const handleViewAST = (astData) => {
-      currentAST.value = astData;
-      showASTViewer.value = true;
+    const handleViewAST = (message) => {
+      if (message.astData) {
+        currentAST.value = message.astData;
+        showASTViewer.value = true;
+      } else {
+        // 如果消息没有AST数据，请求后端解析
+        parseAndShowAST(message.content);
+      }
+    };
+
+    const parseAndShowAST = async (code) => {
+      try {
+        const response = await fetch('/api/parse-ast', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        
+        const result = await response.json();
+        currentAST.value = result;
+        showASTViewer.value = true;
+      } catch (error) {
+        console.error('解析AST失败:', error);
+      }
     };
 
     return {
