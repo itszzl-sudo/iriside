@@ -3,6 +3,7 @@
     <div class="header">
       <h1>AST-IDE</h1>
       <div class="header-actions">
+        <button @click="showSmartSuggestions = !showSmartSuggestions" class="header-btn">💡 建议</button>
         <button @click="showHistory = !showHistory" class="header-btn">📜 历史</button>
         <button @click="showTemplates = !showTemplates" class="header-btn">📋 模板</button>
         <ModeSwitch :mode="currentMode" @change="handleModeChange" />
@@ -213,6 +214,11 @@
       </div>
     </div>
     
+    <!-- 智能建议面板 -->
+    <div v-if="showSmartSuggestions" class="smart-suggestions-overlay" @click.self="showSmartSuggestions = false">
+      <SmartSuggestions />
+    </div>
+    
     <!-- 问题解决器面板 -->
     <div v-if="showProblemSolver" class="problem-solver-overlay" @click.self="showProblemSolver = false">
       <ProblemSolverUI />
@@ -225,6 +231,7 @@ import { ref, onMounted, computed } from 'vue';
 import ChatBox from './components/ChatBox.vue';
 import ModeSwitch from './components/ModeSwitch.vue';
 import ProblemSolverUI from './components/ProblemSolverUI.vue';
+import SmartSuggestions from './components/SmartSuggestions.vue';
 import { HelloWorldGenerator } from '../hello-world/HelloWorldGenerator.js';
 
 export default {
@@ -232,7 +239,8 @@ export default {
   components: {
     ChatBox,
     ModeSwitch,
-    ProblemSolverUI
+    ProblemSolverUI,
+    SmartSuggestions
   },
   setup() {
     const currentMode = ref('vibe');
@@ -253,6 +261,7 @@ export default {
     const helloWorldProgress = ref(0);
     const helloWorldSuggestions = ref([]);
     const showProblemSolver = ref(false);
+    const showSmartSuggestions = ref(false);
     
     const helloWorldLevels = ref([
       { name: 'Hello World', desc: '最基础的开始' },
@@ -772,6 +781,7 @@ export default {
       helloWorldLevels,
       helloWorldSuggestions,
       showProblemSolver,
+      showSmartSuggestions,
       handleModeChange,
       handleSend,
       loadHistory,
@@ -1039,6 +1049,21 @@ body {
 }
 
 .problem-solver-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  overflow: auto;
+  padding: 40px 20px;
+}
+
+.smart-suggestions-overlay {
   position: fixed;
   top: 0;
   left: 0;
