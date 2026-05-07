@@ -8,8 +8,7 @@ const ContextManager = require('./src/ai-engine/ContextManager');
 
 async function startServer() {
   const app = express();
-  app.use(express.json());
-
+  
   // 初始化AI
   const aiConnector = new AIConnector();
   aiConnector.registerProvider('deepseek', new DeepSeekProvider());
@@ -18,12 +17,21 @@ async function startServer() {
   const contextManager = new ContextManager();
   const codeGenerator = new CodeGenerator(aiConnector, contextManager);
 
-  // API路由
+  // API路由 - 必须在Vite中间件之前
+  app.use('/api', express.json());
+  
   app.post('/api/generate', async (req, res) => {
     try {
       const { prompt, mode } = req.body;
       
-      console.log(`[${new Date().toLocaleTimeString()}] 收到请求: ${prompt.substring(0, 50)}...`);
+      console.log(`[${new Date().toLocaleTimeString()}] 收到请求:`, prompt?.substring(0, 50));
+      
+      if (!prompt) {
+        return res.status(400).json({
+          success: false,
+          message: '缺少prompt参数'
+        });
+      }
       
       contextManager.createSession(Date.now().toString());
       
@@ -56,6 +64,7 @@ async function startServer() {
     appType: 'spa'
   });
 
+  // Vite中间件放在API路由之后
   app.use(vite.middlewares);
 
   const PORT = 3000;
