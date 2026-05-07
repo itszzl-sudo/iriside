@@ -1,1 +1,10 @@
 .codeartsdoer/
+node_modules/
+dist/
+.env
+.DS_Store
+*.log
+.iriside/
+test-project/.iriside/
+package-lock.json
+

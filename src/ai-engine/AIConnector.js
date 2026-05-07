@@ -1,20 +1,39 @@
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
 class AIConnector {
   constructor(options = {}) {
     this.providers = new Map();
-    this.defaultProvider = options.defaultProvider || 'deepseek';
+    this.defaultProvider = options.defaultProvider || 'openai';
     this.apiKeys = {};
     this.loadConfig();
   }
 
   loadConfig() {
+    // 优先从环境变量读取API密钥
+    if (process.env.OPENAI_API_KEY) {
+      this.apiKeys.openai = process.env.OPENAI_API_KEY;
+    }
+    if (process.env.DEEPSEEK_API_KEY) {
+      this.apiKeys.deepseek = process.env.DEEPSEEK_API_KEY;
+    }
+    if (process.env.AI_API_KEY) {
+      this.apiKeys.custom = process.env.AI_API_KEY;
+    }
+    
+    // 从配置文件读取（作为备用）
     const configPath = path.join(process.cwd(), '.iriside', 'ai-config.json');
     if (fs.existsSync(configPath)) {
       const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-      this.apiKeys = config.apiKeys || {};
+      // 环境变量优先级更高
+      this.apiKeys = { ...config.apiKeys, ...this.apiKeys };
       this.defaultProvider = config.defaultProvider || this.defaultProvider;
+    }
+
+    // 从环境变量读取默认provider
+    if (process.env.AI_PROVIDER) {
+      this.defaultProvider = process.env.AI_PROVIDER;
     }
   }
 
@@ -121,10 +140,12 @@ class OpenAIProvider {
     const apiKey = options.apiKey;
     
     if (!apiKey) {
-      throw new Error('OpenAI API key not provided');
+      throw new Error('OpenAI API key not provided. Please set OPENAI_API_KEY in .env file');
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const apiBase = process.env.OPENAI_API_BASE || 'https://api.openai.com/v1';
+    
+    const response = await fetch(`${apiBase}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -139,6 +160,11 @@ class OpenAIProvider {
     });
 
     const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(`OpenAI API Error: ${data.error.message}`);
+    }
+    
     return data.choices[0].message.content;
   }
 }

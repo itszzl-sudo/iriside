@@ -2,7 +2,42 @@
 
 ## 快速开始
 
-### 开发模式
+### 1. 配置AI服务（重要）
+
+AST-IDE需要配置AI服务的API密钥才能正常工作。
+
+**创建环境变量文件：**
+```bash
+# 复制示例文件
+cp .env.example .env
+
+# 编辑.env文件，填入真实的API密钥
+```
+
+**.env文件配置：**
+```env
+# OpenAI API密钥（必需）
+OPENAI_API_KEY=sk-your-real-api-key-here
+
+# DeepSeek API密钥（可选）
+DEEPSEEK_API_KEY=sk-your-deepseek-key-here
+
+# AI服务提供商选择
+AI_PROVIDER=openai
+
+# 自定义API端点（可选，用于代理）
+# OPENAI_API_BASE=https://your-proxy.com/v1
+```
+
+**支持的AI服务：**
+- **OpenAI**: 设置 `OPENAI_API_KEY`，使用 `AI_PROVIDER=openai`
+- **DeepSeek**: 设置 `DEEPSEEK_API_KEY`，使用 `AI_PROVIDER=deepseek`
+- **Mock**: 测试模式，使用 `AI_PROVIDER=mock`
+
+**配置优先级：**
+环境变量 > 配置文件 > 默认值
+
+### 2. 安装依赖
 
 ```bash
 # 安装依赖
