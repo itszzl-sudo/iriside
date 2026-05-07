@@ -125,6 +125,40 @@ async function startServer() {
     }
   });
 
+  // 直接保存代码路由（Hello World功能）
+  app.post('/api/save-direct', async (req, res) => {
+    try {
+      const { code, filename } = req.body;
+      
+      if (!code || !filename) {
+        return res.status(400).json({
+          success: false,
+          message: '缺少code或filename参数'
+        });
+      }
+      
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const finalFilename = `hello-${timestamp}-${filename}`;
+      const filepath = path.join(outputDir, finalFilename);
+      
+      fs.writeFileSync(filepath, code, 'utf8');
+      console.log(`[${new Date().toLocaleTimeString()}] 已保存:`, finalFilename);
+      
+      res.json({
+        success: true,
+        file: finalFilename,
+        message: '代码保存成功'
+      });
+      
+    } catch (error) {
+      console.error('保存错误:', error.message);
+      res.status(500).json({
+        success: false,
+        message: `保存失败: ${error.message}`
+      });
+    }
+  });
+
   // AST解析路由
   app.post('/api/parse-ast', async (req, res) => {
     try {

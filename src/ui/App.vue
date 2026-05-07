@@ -216,6 +216,7 @@
 import { ref, onMounted, computed } from 'vue';
 import ChatBox from './components/ChatBox.vue';
 import ModeSwitch from './components/ModeSwitch.vue';
+import { HelloWorldGenerator } from '../hello-world/HelloWorldGenerator.js';
 
 export default {
   name: 'App',
@@ -600,71 +601,124 @@ export default {
     };
 
     // Hello World 功能实现
-    const startHelloLevel = (level) => {
-      const levelPrompts = [
-        '创建一个最简单的Hello World页面，只有一个h1标签显示"Hello World"',
-        '在Hello World基础上添加CSS样式：字体用sans-serif，颜色用蓝色，字号48px',
-        '创建一个居中的Hello World页面：内容在屏幕正中央，使用flexbox布局，背景色浅灰',
-        '创建一个可交互的Hello World：鼠标悬停文字放大1.2倍，点击弹出alert',
-        '创建一个动画Hello World：文字淡入效果，持续2秒，循环呼吸动画',
-        '创建一个响应式Hello World：手机端字号24px，平板36px，桌面48px，使用媒体查询',
-        '创建一个完整的小应用：Hello World标题、输入框、按钮，点击按钮显示自定义问候语'
-      ];
-      
+    const startHelloLevel = async (level) => {
       helloWorldProgress.value = level;
       showHelloWorldPanel.value = false;
-      handleSend(levelPrompts[level]);
+      
+      const code = HelloWorldGenerator.generate('level', level);
+      
+      messages.value.push({
+        type: 'user',
+        content: `开始第 ${level + 1} 关：${helloWorldLevels.value[level].name}`,
+        timestamp: Date.now()
+      });
+      
+      await handleDirectCode(code, `level-${level + 1}.html`);
       
       setTimeout(() => {
         generateHelloSuggestions(level);
-      }, 1000);
+      }, 500);
     };
 
-    const startChallenge = (type) => {
+    const startChallenge = async (type) => {
       showHelloWorldPanel.value = false;
       
-      const challenges = {
-        random: ['创建一个Hello World，随机使用一种配色方案', '创建一个Hello World，随机添加一种装饰效果', '创建一个Hello World，随机选择一种字体风格'][Math.floor(Math.random() * 3)],
-        timer: '创建一个Hello World页面，文字会每秒变色一次，持续10秒，使用JavaScript setInterval',
-        ai: '创建两个不同风格的Hello World，一个极简风格，一个华丽风格，让用户选择更喜欢哪个',
-        reverse: '我给你看一个Hello World的CSS效果描述，你来生成对应的代码：文字有金色渐变、阴影、3D旋转效果'
-      };
+      const code = HelloWorldGenerator.generate('challenge', type);
       
-      handleSend(challenges[type]);
+      messages.value.push({
+        type: 'user',
+        content: `开始挑战：${type === 'random' ? '随机挑战' : type === 'timer' ? '限时挑战' : type === 'ai' ? 'AI对战' : '逆向工程'}`,
+        timestamp: Date.now()
+      });
+      
+      await handleDirectCode(code, `challenge-${type}.html`);
     };
 
-    const createHelloVariant = (variant) => {
+    const createHelloVariant = async (variant) => {
       showHelloWorldPanel.value = false;
       
-      const variants = {
-        minimal: '创建最简Hello World：纯文本，无样式，10行以内代码',
-        styled: '创建精美Hello World：渐变背景、优雅字体、居中布局、阴影效果',
-        animated: '创建动画Hello World：文字弹跳进入、颜色渐变循环、粒子背景',
-        interactive: '创建交互Hello World：可拖拽文字、点击变色、双击放大、右键菜单',
-        responsive: '创建响应式Hello World：适配手机/平板/桌面/超大屏幕，每个尺寸有不同布局',
-        dark: '创建暗黑风Hello World：深色背景、霓虹文字、发光效果、科技感',
-        neon: '创建霓虹风Hello World：紫色/青色霓虹灯效果、闪烁动画、赛博朋克风格',
-        '3d': '创建3D Hello World：文字3D旋转、透视效果、立体感、悬浮动画',
-        particle: '创建粒子Hello World：文字由粒子组成、鼠标靠近粒子散开、远离聚合',
-        game: '创建游戏化Hello World：文字是游戏角色、可控制移动、收集星星、计分系统',
-        music: '创建音效Hello World：点击文字播放音符、悬停有音效、键盘可演奏',
-        canvas: '创建Canvas Hello World：使用Canvas绘制文字、波浪效果、动态背景'
+      const code = HelloWorldGenerator.generate('variant', variant);
+      
+      const variantNames = {
+        minimal: '最简版', styled: '美化版', animated: '动画版', interactive: '交互版',
+        responsive: '响应式', dark: '暗黑风', neon: '霓虹风', '3d': '3D效果',
+        particle: '粒子版', game: '游戏化', music: '音效版', canvas: 'Canvas版'
       };
       
-      handleSend(variants[variant]);
+      messages.value.push({
+        type: 'user',
+        content: `创建 ${variantNames[variant]} Hello World`,
+        timestamp: Date.now()
+      });
+      
+      await handleDirectCode(code, `hello-${variant}.html`);
     };
 
-    const openLab = (type) => {
+    const openLab = async (type) => {
       showHelloWorldPanel.value = false;
       
-      const labs = {
-        mix: '创建一个Hello World，随机混合以下风格中的3种：霓虹、复古、极简、赛博朋克、日式、欧式、工业风',
-        evolve: '创建一个可以自动进化的Hello World：每5秒自动改变一种样式属性（颜色、字号、位置），展示20种变化',
-        remix: '创建一个AI Remix版Hello World：融合音乐可视化、粒子效果、响应式设计三种技术',
-        mutation: '创建一个变异Hello World：从基础版本开始，逐步变异出10种不同的子版本，每个都保持Hello World核心'
+      const code = HelloWorldGenerator.generate('lab', type);
+      
+      const labNames = {
+        mix: '混合风格', evolve: '自动进化', remix: 'AI Remix', mutation: '变异生成'
       };
       
-      handleSend(labs[type]);
+      messages.value.push({
+        type: 'user',
+        content: `实验室：${labNames[type]}`,
+        timestamp: Date.now()
+      });
+      
+      await handleDirectCode(code, `lab-${type}.html`);
+    };
+
+    const handleDirectCode = async (code, filename) => {
+      messages.value.push({
+        type: 'assistant',
+        content: '🎨 正在生成...',
+        timestamp: Date.now(),
+        loading: true
+      });
+
+      try {
+        const response = await fetch('/api/save-direct', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, filename })
+        });
+
+        const result = await response.json();
+        
+        currentCode.value = code;
+        currentFile.value = result.file;
+        previewContent.value = code;
+        showPreview.value = true;
+        showCode.value = false;
+        
+        const historyItem = {
+          timestamp: Date.now(),
+          prompt: `Hello World: ${filename}`,
+          code: code,
+          file: result.file,
+          preview: code
+        };
+        history.value.unshift(historyItem);
+        if (history.value.length > 20) history.value.pop();
+        localStorage.setItem('ast-ide-history', JSON.stringify(history.value));
+        
+        messages.value[messages.value.length - 1] = {
+          type: 'assistant',
+          content: `✅ 已生成！\n📁 ${result.file}`,
+          timestamp: Date.now()
+        };
+        
+      } catch (error) {
+        messages.value[messages.value.length - 1] = {
+          type: 'assistant',
+          content: `❌ 错误: ${error.message}`,
+          timestamp: Date.now()
+        };
+      }
     };
 
     const generateHelloSuggestions = (level) => {
