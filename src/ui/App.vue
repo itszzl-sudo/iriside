@@ -140,6 +140,9 @@
         <button @click="showHelloWorldPanel = !showHelloWorldPanel" class="hello-world-btn">
           🚀 从Hello World开始
         </button>
+        <button @click="showProblemSolver = !showProblemSolver" class="solver-btn">
+          🧠 复杂问题解决器
+        </button>
         <div v-if="showHelloWorldPanel" class="hello-world-panel">
           <div class="panel-section">
             <h4>📊 渐进式学习路径</h4>
@@ -209,6 +212,11 @@
         </div>
       </div>
     </div>
+    
+    <!-- 问题解决器面板 -->
+    <div v-if="showProblemSolver" class="problem-solver-overlay" @click.self="showProblemSolver = false">
+      <ProblemSolverUI />
+    </div>
   </div>
 </template>
 
@@ -216,13 +224,15 @@
 import { ref, onMounted, computed } from 'vue';
 import ChatBox from './components/ChatBox.vue';
 import ModeSwitch from './components/ModeSwitch.vue';
+import ProblemSolverUI from './components/ProblemSolverUI.vue';
 import { HelloWorldGenerator } from '../hello-world/HelloWorldGenerator.js';
 
 export default {
   name: 'App',
   components: {
     ChatBox,
-    ModeSwitch
+    ModeSwitch,
+    ProblemSolverUI
   },
   setup() {
     const currentMode = ref('vibe');
@@ -242,6 +252,7 @@ export default {
     const showHelloWorldPanel = ref(false);
     const helloWorldProgress = ref(0);
     const helloWorldSuggestions = ref([]);
+    const showProblemSolver = ref(false);
     
     const helloWorldLevels = ref([
       { name: 'Hello World', desc: '最基础的开始' },
@@ -760,6 +771,7 @@ export default {
       helloWorldProgress,
       helloWorldLevels,
       helloWorldSuggestions,
+      showProblemSolver,
       handleModeChange,
       handleSend,
       loadHistory,
@@ -1005,6 +1017,40 @@ body {
 
 .suggestion-icon {
   font-size: 20px;
+}
+
+.solver-btn {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+  margin-left: 20px;
+}
+
+.solver-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.6);
+}
+
+.problem-solver-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  overflow: auto;
+  padding: 40px 20px;
 }
 
 .header h1 {
