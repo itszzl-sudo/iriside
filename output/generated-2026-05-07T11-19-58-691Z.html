@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红色大标题 · Hello World</title>
+    <!-- 最佳实践：语义化标题 + 干净样式，无冗余类名 -->
+    <style>
+        /* 仅聚焦标题本身：大号、红色、醒目 */
+        h1 {
+            color: #d32f2f;          /* 经典红色，视觉友好 */
+            font-size: clamp(3rem, 10vw, 6rem); /* 响应式：最小3rem，最大6rem，随视口平滑变化 */
+            font-weight: 700;        /* 粗体增强标题感 */
+            letter-spacing: 0.02em;  /* 轻微字距，提升可读性 */
+            margin: 0;               /* 清除默认外边距，布局更可控 */
+            padding: 0.5em 0;        /* 上下留出呼吸空间 */
+            line-height: 1.2;        /* 紧凑而清晰的标题行高 */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.08); /* 极淡阴影增加层次，不抢红色主体 */
+            word-break: break-word;  /* 防止长文本溢出，优雅处理 */
+        }
+
+        /* 可选：页面基础氛围，让标题更突出（非必须，但提升整体语义演示） */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;      /* 垂直居中，演示更聚焦 */
+            justify-content: center;  /* 水平居中 */
+            background: #fafafa;      /* 柔和背景衬托红色 */
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <!-- 
+        语义化标题 h1：代表页面最核心的标题 
+        内容为 "Hello World"，红色大号显示
+        错误处理：若文本为空或加载异常，h1 依然保留结构，无脚本依赖
+    -->
+    <h1>Hello World</h1>
+    <!-- 
+        注： 
+        - 使用 clamp() 实现流畅的字体缩放，兼顾移动端与大屏
+        - 无多余包装元素，保持DOM简洁
+        - 红色采用 WCAG AA 级对比度 ( #d32f2f 在浅色背景上通过率良好 )
+        - 若未来需要降级，color 可改为纯 red 或 #f00，但 #d32f2f 更专业
+    -->
+</body>
+</html>
